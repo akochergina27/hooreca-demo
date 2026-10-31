@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HoReCa Hub — прототип A</title>
+<link rel="preload" href="../fonts/manrope-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/golos-text-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Manrope";src:url(../fonts/manrope-cyrillic-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Manrope";src:url(../fonts/manrope-latin-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap}
+@font-face{font-family:"Golos";src:url(../fonts/golos-text-cyrillic-wght-normal.woff2) format("woff2");font-weight:400 900;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Golos";src:url(../fonts/golos-text-latin-wght-normal.woff2) format("woff2");font-weight:400 900;font-display:swap}
+
+/* Токены «Лесной домик» — значения из src/index.css */
+:root{
+  --background:#f4f0e8;--foreground:#1e2622;--surface:#fbf9f5;--tone:#ede7db;--tone-strong:#e6dfd0;
+  --primary:#2f5b45;--primary-hover:#264b39;--primary-soft:#e1eae2;--primary-ink:#24473a;
+  --muted:#5e6660;--danger:#b4532a;--danger-soft:#f5e4d9;--danger-ink:#9a4421;
+  --warning:#b07a1c;--warning-soft:#f4ead2;--warning-ink:#7a5512;
+  --success:#4e7a3a;--success-soft:#e6eedc;--success-ink:#3b5e2b;
+  --border:#e3dccd;--input:#d6cdbb;--input-border:#857d6d;
+  --r-control:12px;--r-card:16px;--r-section:20px;
+  --shadow-card:0 1px 2px rgb(60 48 30 / .05),0 6px 20px rgb(60 48 30 / .04);
+  --shadow-pop:0 2px 6px rgb(60 48 30 / .06),0 12px 32px rgb(60 48 30 / .08);
+  --f-head:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-text:"Golos",system-ui,-apple-system,"Segoe UI",sans-serif;
+  /* 5 кеглей: 13 / 16 / 20 / 40 / 56 (на телефоне 13 / 16 / 18 / 28 / 34) */
+  --fs-s:13px;--fs-b:16px;--fs-l:20px;--fs-h2:40px;--fs-h1:56px;
+  --ease:cubic-bezier(.2,.6,.2,1);
+}
+@media (max-width:640px){:root{--fs-l:18px;--fs-h2:28px;--fs-h1:34px}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--background);color:var(--foreground);font:400 var(--fs-b)/1.55 var(--f-text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{font-family:var(--f-head);margin:0;letter-spacing:-.01em}
+p{margin:0}
+a{color:inherit}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- кнопки ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 22px;border-radius:var(--r-control);font:600 var(--fs-b)/1 var(--f-text);text-decoration:none;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+.btn-p{background:var(--primary);color:#fff}
+.btn-p:hover{background:var(--primary-hover)}
+.btn-g{background:transparent;color:var(--foreground);border-color:var(--input)}
+.btn-g:hover{background:var(--tone)}
+.btn:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+/* ---------- шапка ---------- */
+.hdr{position:sticky;top:0;z-index:20;background:var(--background);border-bottom:1px solid var(--border)}
+.hdr-in{max-width:1200px;margin:0 auto;padding:0 40px;height:64px;display:flex;align-items:center;gap:32px}
+.logo{display:flex;align-items:center;gap:10px;font:700 var(--fs-b)/1 var(--f-head);text-decoration:none}
+.logo i{width:28px;height:28px;border-radius:8px;background:var(--primary);display:grid;place-items:center}
+.nav{display:flex;gap:28px;margin-left:auto;font-size:var(--fs-s)}
+.nav a{text-decoration:none;color:var(--muted)}
+.nav a:hover{color:var(--foreground)}
+.hdr .btn{height:40px;padding:0 16px;font-size:var(--fs-s)}
+.hdr-login{color:var(--foreground);font-size:var(--fs-s);text-decoration:none;font-weight:600}
+
+/* ---------- экраны ---------- */
+main{display:block}
+.blk{max-width:1200px;margin:0 auto 20px;padding:110px 40px}
+.head{max-width:720px;margin:0 auto 72px;text-align:center}
+.eye{display:block;font-size:var(--fs-s);color:var(--primary-ink);font-weight:600;margin-bottom:16px}
+.h2{font-size:var(--fs-h2);line-height:1.15;font-weight:700}
+.lead{font-size:var(--fs-l);line-height:1.5;color:var(--muted);margin-top:20px;max-width:640px;margin-left:auto;margin-right:auto}
+.h3{font-size:var(--fs-l);line-height:1.3;font-weight:700}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow-card)}
+.muted{color:var(--muted)}
+.s{font-size:var(--fs-s)}
+
+/* ---------- 1. герой ---------- */
+.hero{padding-top:96px;display:grid;grid-template-columns:11fr 13fr;gap:56px;align-items:center}
+.hero h1{font-size:var(--fs-h1);line-height:1.1;font-weight:700;letter-spacing:-.02em}
+.hero .lead{margin:24px 0 0;text-align:left}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:36px}
+.note{margin-top:20px;font-size:var(--fs-s);color:var(--muted)}
+
+/* живая сцена: мини-шахматка */
+.scene{position:relative;overflow:hidden;padding:20px;border-radius:var(--r-section);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-pop);font-size:var(--fs-s);line-height:1.3;user-select:none}
+.sc-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.sc-title{font:700 var(--fs-b)/1.2 var(--f-head)}
+.sc-title span{font:400 var(--fs-s)/1 var(--f-text);color:var(--muted);margin-left:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--tone);color:var(--foreground);white-space:nowrap}
+.chip b{display:inline-block;min-width:.6em;text-align:center;font-weight:700}
+.chip.done{background:var(--primary-soft);color:var(--primary-ink)}
+.grid{position:relative;display:grid;grid-template-columns:84px repeat(var(--d),1fr);grid-template-rows:44px repeat(var(--r),60px);border-top:1px solid var(--border)}
+.gd{border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);line-height:1.15}
+.gd b{color:var(--foreground);font-weight:600}
+.gd.today b{color:var(--primary-ink)}
+.gr{border-bottom:1px solid var(--border);display:flex;align-items:center;font-weight:600}
+.gc{border-bottom:1px solid var(--border);border-left:1px solid var(--border)}
+.todaycol{background:var(--primary-soft);opacity:.6;border-radius:8px 8px 0 0}
+.gd,.gr{position:relative;z-index:1}
+.bar{position:relative;z-index:2;align-self:center;height:40px;margin:0 3px;border-radius:8px;display:flex;align-items:center;gap:6px;padding:0 8px 0 12px;overflow:hidden;white-space:nowrap}
+.bar .ly{position:absolute;inset:0;border-radius:inherit;transition:opacity .45s var(--ease)}
+.bar .ly::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+.ly-ok{background:var(--tone-strong)}
+.ly-ok::before{background:var(--input-border)}
+.ly-pend{background:var(--warning-soft)}
+.ly-pend::before{background:var(--warning)}
+.ly-in{background:var(--primary-soft);opacity:0}
+.ly-in::before{background:var(--primary)}
+.bar[data-k="in"] .ly-in{opacity:1}
+.bar.cut{border-top-right-radius:0;border-bottom-right-radius:0;margin-right:0}
+.bar .bn,.bar .bgst,.bar .tick{position:relative}
+.bar .bn{font-weight:600}
+.bar .bgst{color:var(--muted)}
+.tick{width:16px;height:16px;flex:none;margin-left:auto}
+.tick circle{fill:var(--primary)}
+.tick path{fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:12;stroke-dashoffset:12;transition:stroke-dashoffset .35s var(--ease) .15s}
+.tick circle{transform-origin:8px 8px;transform:scale(0);transition:transform .3s var(--ease)}
+.bar.go .tick circle{transform:scale(1)}
+.bar.go .tick path{stroke-dashoffset:0}
+.legend{display:flex;gap:16px;margin-top:14px;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px}
+
+/* карточка брони */
+.bk{position:absolute;z-index:5;width:240px;padding:16px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-pop);opacity:0;transform:translateY(12px);transition:opacity .35s var(--ease),transform .4s var(--ease);pointer-events:none}
+.bk.on{opacity:1;transform:none}
+.bk-n{font:700 var(--fs-b)/1.3 var(--f-head)}
+.bk-m{color:var(--muted);margin-top:4px}
+.bk-h{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);color:var(--muted)}
+.bk-b{position:relative;margin-top:12px;height:36px;border-radius:10px;background:var(--primary);color:#fff;font-weight:600;display:grid;place-items:center}
+.bk-b span{grid-area:1/1;transition:opacity .25s}
+.bk-b .b2{opacity:0}
+.bk-b.done .b1{opacity:0}
+.bk-b.done .b2{opacity:1}
+/* курсор */
+.cur{position:absolute;left:0;top:0;z-index:9;width:22px;height:22px;pointer-events:none;will-change:transform;opacity:0;transition:opacity .3s}
+.cur.on{opacity:1}
+.cur svg{display:block;width:22px;height:22px;filter:drop-shadow(0 2px 3px rgb(30 38 34 / .25))}
+.cur .ring{position:absolute;left:-12px;top:-12px;width:24px;height:24px;border-radius:50%;border:2px solid var(--primary);opacity:0}
+
+/* ---------- 2. боль ---------- */
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}
+.pc{padding:32px}
+.pc p{margin-top:12px;color:var(--muted)}
+.pc .mini{padding-top:24px}
+.paper{border-radius:10px;background:var(--background);border:1px solid var(--border);padding:12px 14px;font-size:var(--fs-s);line-height:1.6}
+.paper .flag{color:var(--danger-ink);font-weight:600}
+.paper s{color:var(--muted)}
+.unread{float:right;background:var(--danger);color:#fff;border-radius:999px;padding:0 8px;font-weight:600}
+
+/* ---------- 3. Сегодня ---------- */
+.app{padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.app-top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.app-top b{font:700 var(--fs-l)/1.2 var(--f-head)}
+.col-t{font-weight:600;margin-bottom:12px;font-size:var(--fs-s);color:var(--muted)}
+.row{display:flex;gap:12px;align-items:flex-start;padding:14px 4px;margin-bottom:0;font-size:var(--fs-s);line-height:1.45}
+.row+.row::before{content:"";position:absolute;left:4px;right:4px;top:0;height:1px;background:var(--border)}
+.row{position:relative}
+.row .t{font-weight:600;font-size:var(--fs-b);line-height:1.35}
+.row .grow{flex:1;min-width:0}
+.row.att{background:var(--warning-soft);border-radius:12px;padding:14px 16px;margin-bottom:6px}
+.tag{display:inline-block;font-size:var(--fs-s);font-weight:600;color:var(--warning-ink);margin-bottom:2px}
+.mini-btn{flex:none;align-self:center;height:32px;padding:0 12px;border-radius:10px;font-weight:600;display:inline-flex;align-items:center;white-space:nowrap}
+.mini-btn.p{background:var(--primary);color:#fff}
+.mini-btn.o{border:1px solid var(--input);background:var(--surface)}
+
+/* ---------- 4. склад ---------- */
+.split{display:grid;grid-template-columns:7fr 5fr;gap:24px}
+.stock{padding:28px}
+.stock-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px}
+.sr{display:grid;grid-template-columns:1fr auto;gap:6px 16px;padding:12px 0;font-size:var(--fs-s)}
+.sr b{font-size:var(--fs-b);font-weight:600}
+.sr .st{text-align:right;font-weight:600}
+.sr .st.no{color:var(--danger-ink)}
+.sr .st.ok{color:var(--success-ink)}
+.track{grid-column:1/-1;height:8px;border-radius:99px;background:var(--tone-strong);overflow:hidden}
+.track i{display:block;height:100%;border-radius:inherit;background:var(--success);transform-origin:left}
+.track i.no{background:var(--danger)}
+.stock .mini-btn{margin-top:16px}
+.flow{display:grid;gap:16px;align-content:start}
+.fc{padding:24px 24px 24px 72px;position:relative}
+.fc .num{position:absolute;left:24px;top:24px;width:32px;height:32px;border-radius:50%;background:var(--primary-soft);color:var(--primary-ink);display:grid;place-items:center;font:700 var(--fs-s)/1 var(--f-head)}
+.fc p{margin-top:6px;color:var(--muted)}
+
+/* ---------- 5. МВД ---------- */
+.steps{position:relative}
+.mc{padding:32px;display:flex;flex-direction:column}
+.mc .day{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.cal{width:56px;height:60px;border-radius:12px;border:1px solid var(--border);background:var(--background);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.cal b{font:700 var(--fs-l)/1 var(--f-head)}
+.mc p{margin-top:12px;color:var(--muted)}
+.mc .pill{margin-top:20px;align-self:flex-start;padding:6px 12px;border-radius:999px;font-size:var(--fs-s);font-weight:600}
+.mc.warn{border-color:var(--warning);background:var(--warning-soft)}
+.pill.w{background:var(--surface);color:var(--warning-ink)}
+.pill.g{background:var(--primary-soft);color:var(--primary-ink)}
+.pill.n{background:var(--tone);color:var(--muted)}
+.mvd-note{max-width:680px;margin:40px auto 0;text-align:center;color:var(--muted)}
+
+/* ---------- 6. команда ---------- */
+.rc{padding:32px}
+.av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font:700 var(--fs-b)/1 var(--f-head);margin-bottom:24px;background:var(--primary-soft);color:var(--primary-ink)}
+.rc p{margin-top:12px;color:var(--muted)}
+.acc{padding-top:24px;display:flex;flex-wrap:wrap;gap:8px}
+.acc span{font-size:var(--fs-s);padding:4px 10px;border-radius:999px;background:var(--primary-soft);color:var(--primary-ink)}
+.acc span.x{background:var(--tone);color:var(--muted);text-decoration:line-through}
+
+/* ---------- 7. уборка ---------- */
+.side{display:grid;grid-template-columns:5fr 7fr;gap:56px;align-items:center}
+.side .head{margin:0;text-align:left}
+.side .lead{margin-left:0}
+.clean{padding:32px}
+.clean-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+.cr{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:24px 4px 8px;position:relative}
+.cr::before{content:"";position:absolute;left:4px;right:0;top:0;height:3px;border-radius:3px;background:var(--warning)}
+.cr.ok::before{background:var(--success)}
+.cr .mini-btn{margin-top:6px;align-self:flex-start}
+.cr-h{display:flex;align-items:center;gap:10px;font-size:var(--fs-l)}
+.cr .dot{width:10px;height:10px;border-radius:50%;background:var(--warning);flex:none}
+.cr .dot.ok{background:var(--success)}
+.cr b{font-weight:600}
+.cr .grow{flex:1}
+.cr .stt{font-size:var(--fs-s);color:var(--muted)}
+.flowline{display:flex;gap:10px;align-items:center;margin-top:20px;color:var(--muted);font-size:var(--fs-s);flex-wrap:wrap}
+.flowline span{padding:6px 12px;border-radius:999px;background:var(--tone)}
+
+/* ---------- 8. пилот ---------- */
+.pl{padding:32px}
+.pl .num{width:40px;height:40px;border-radius:50%;border:1px solid var(--input);display:grid;place-items:center;font:700 var(--fs-b)/1 var(--f-head);margin-bottom:28px}
+.pl p{margin-top:12px;color:var(--muted)}
+
+/* ---------- 9. заявка (единственный лесной блок) ---------- */
+.forest{background:var(--primary-ink);color:#fff;border-radius:var(--r-section);display:grid;grid-template-columns:6fr 5fr;gap:56px;align-items:center;margin-bottom:96px}
+.forest .head{margin:0;text-align:left}
+.forest .lead{color:rgb(255 255 255 / .82);margin-left:0}
+.forest .eye{color:var(--primary-soft)}
+.contact{margin-top:28px;color:rgb(255 255 255 / .82)}
+.contact a{color:#fff;font-weight:600}
+.form{padding:32px;color:var(--foreground);box-shadow:none;border:0}
+.form fieldset{border:0;margin:0 0 20px;padding:0}
+.form legend,.form label.l{display:block;font-size:var(--fs-s);font-weight:600;margin-bottom:8px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--tone);border-radius:var(--r-control)}
+.seg input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);margin:0}
+.seg label{display:block;text-align:center;padding:10px;border-radius:9px;cursor:pointer;font-weight:600;color:var(--muted)}
+.seg input:checked+label{background:var(--surface);color:var(--foreground);box-shadow:var(--shadow-card)}
+.seg input:focus-visible+label{outline:2px solid var(--primary)}
+.inp{width:100%;height:48px;border-radius:var(--r-control);border:1px solid var(--input-border);background:#fff;padding:0 14px;font:inherit;color:inherit}
+.form .btn{width:100%;margin-top:16px}
+.legal{margin-top:14px;font-size:var(--fs-s);color:var(--muted)}
+.ok-msg{margin-top:14px;font-size:var(--fs-s);color:var(--success-ink);font-weight:600}
+
+/* ---------- подвал ---------- */
+.ftr{border-top:1px solid var(--border)}
+.ftr-in{max-width:1200px;margin:0 auto;padding:48px 40px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;font-size:var(--fs-s);color:var(--muted)}
+.ftr-in b{display:block;font:700 var(--fs-b)/1.3 var(--f-head);color:var(--foreground);margin-bottom:8px}
+.ftr-in a{display:block;text-decoration:none;margin-bottom:6px}
+.ftr-in a:hover{color:var(--foreground)}
+.proto{grid-column:1/-1;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:24px;border-top:1px solid var(--border)}
+
+/* ---------- телефон ---------- */
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:40px}
+  .three,.split,.side,.forest{grid-template-columns:1fr}
+  .side .head,.forest .head{text-align:left}
+}
+@media (max-width:640px){
+  .hdr-in{padding:0 20px;height:56px;gap:12px}
+  .nav,.hdr .btn{display:none}
+  .hdr-login{margin-left:auto}
+  .blk{padding:50px 20px;margin-bottom:24px}
+  .hero{padding-top:36px;gap:36px;min-height:0}
+  .head{margin-bottom:40px;text-align:left}
+  .lead{margin-top:14px}
+  .cta{margin-top:28px}
+  .cta .btn{flex:1}
+  .scene{padding:14px;border-radius:var(--r-card)}
+  .grid{grid-template-columns:70px repeat(var(--d),1fr);grid-template-rows:36px repeat(var(--r),46px)}
+  .bar{padding:0 6px 0 10px;height:34px}
+  .bar .bgst{display:none}
+  .sc-title span{display:none}
+  .bk{left:12px!important;right:12px;top:10px!important;width:auto;padding:12px 14px;transform:translateY(-12px)}
+  .bk-h{display:none}
+  .bk-b{height:34px;margin-top:10px}
+  .three,.flow{gap:24px}
+  .pc,.mc,.rc,.pl{padding:24px}
+  .pc .mini{padding-top:20px}
+  .app{padding:18px;gap:18px;grid-template-columns:1fr}
+  .app-top{flex-direction:column;gap:4px;padding-bottom:14px}
+  .row{padding:12px 2px}
+  .row.att{padding:12px}
+  .row.att .tag{display:none}
+  .stock,.clean{padding:20px}
+  .tiles{grid-template-columns:1fr;gap:10px}
+  .cr{min-height:0;padding:14px 2px 10px;flex-direction:row;flex-wrap:wrap;align-items:center}
+  .cr .stt{flex-basis:100%;order:3}
+  .cr .mini-btn{margin:0 0 0 auto}
+  .cr-h{font-size:var(--fs-b)}
+  .fc{padding:20px 20px 20px 64px}
+  .fc .num{left:20px;top:20px}
+  .mc .day{margin-bottom:18px}
+  .mvd-note{margin-top:24px;text-align:left}
+  .acc{padding-top:18px}
+  .pl .num{margin-bottom:18px}
+  .forest{border-radius:0;margin-bottom:48px;gap:32px}
+  .form{padding:20px}
+  .ftr-in{padding:32px 20px;grid-template-columns:1fr 1fr}
+  .ftr-in>div:first-child{grid-column:1/-1}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+  html{scroll-behavior:auto}
+  .cur,.bk{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <a class="logo" href="#top" aria-label="HoReCa Hub, наверх"><i aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 13 8 3l6 10" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M6 13h4" stroke="#fff" stroke-width="2"/></svg></i>HoReCa Hub</a>
+    <nav class="nav" aria-label="Основная">
+      <a href="#features">Возможности</a>
+      <a href="#mvd">Срок МВД</a>
+      <a href="#waitlist">Заявка</a>
+    </nav>
+    <a class="hdr-login" href="../../../">Войти</a>
+    <a class="btn btn-p" href="#waitlist">Запросить демо</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 1. Первый экран: живая шахматка (К1) -->
+<section class="blk hero" aria-labelledby="h1">
+  <div>
+    <span class="eye">Для глэмпингов и малых отелей</span>
+    <h1 id="h1">Заезды, склад и&nbsp;срок МВД&nbsp;— на&nbsp;одном экране</h1>
+    <p class="lead">Каждое утро собирает дела на&nbsp;сегодня, списывает расход по&nbsp;броням и&nbsp;напоминает о&nbsp;сроке уведомления МВД.</p>
+    <div class="cta">
+      <a class="btn btn-p" href="#waitlist">Запросить демо</a>
+      <a class="btn btn-g" href="../../../">Войти</a>
+    </div>
+    <p class="note">Пилот бесплатно. Подключаем первые объекты.</p>
+  </div>
+
+  <div class="scene" id="scene" data-step="0" role="img" aria-label="Шахматка броней: управляющий открывает бронь Ким и нажимает «Заселить» — бронь становится «В отеле».">
+    <div class="sc-top" aria-hidden="true">
+      <div class="sc-title">Шахматка<span>5–11 ноября</span></div>
+      <div class="chip" id="cnt">Заезды сегодня: <b id="cntN">0</b>&nbsp;из&nbsp;<b id="cntT">2</b></div>
+    </div>
+    <div class="grid" id="grid" aria-hidden="true"></div>
+    <div class="legend" aria-hidden="true">
+      <span><i style="background:var(--warning)"></i>Ожидает</span>
+      <span><i style="background:var(--input-border)"></i>Оплачено</span>
+      <span><i style="background:var(--primary)"></i>В отеле</span>
+    </div>
+    <div class="bk" id="bk" aria-hidden="true">
+      <div class="bk-n" id="bkN">Ким, 2 гостя</div>
+      <div class="bk-m s" id="bkM">Домик 2 · 6–9 ноября · 3 ночи</div>
+      <div class="bk-h s">Расход по нормам спишется при заезде</div>
+      <div class="bk-b" id="bkB"><span class="b1">Заселить</span><span class="b2">В отеле ✓</span></div>
+    </div>
+    <div class="cur" id="cur" aria-hidden="true">
+      <span class="ring" id="ring"></span>
+      <svg viewBox="0 0 22 22" id="curI"><path d="M3 2v16l4.6-4.2 3 6.4 3-1.4-3-6.2H17z" fill="#1e2622" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Боль -->
+<section class="blk" aria-labelledby="h-pain">
+  <div class="head">
+    <h2 class="h2" id="h-pain">Excel, чаты и&nbsp;тетрадь не&nbsp;договорятся</h2>
+    <p class="lead">На&nbsp;малом объекте все держится на&nbsp;памяти владельца. Пока он не&nbsp;уехал в&nbsp;отпуск.</p>
+  </div>
+  <div class="three">
+    <article class="card pc">
+      <h3 class="h3">Брони в&nbsp;таблице</h3>
+      <p>Кто заезжает сегодня, знает тот, кто последним открывал файл.</p>
+      <div class="mini" aria-hidden="true"><div class="paper">Чт · Домик 1 · Орлов<br>Пт · Домик 2 · Ким<br>Пт · Домик 2 · Ким, 2 гостя <span class="flag">дубль?</span><br>Сб · Купол 4 · ?</div></div>
+    </article>
+    <article class="card pc">
+      <h3 class="h3">Дела в&nbsp;чатах</h3>
+      <p>Уборка, поставщики и&nbsp;гости тонут в&nbsp;переписке за&nbsp;неделю.</p>
+      <div class="mini" aria-hidden="true"><div class="paper"><span class="unread">37</span><b>Горничная</b><br>Кто сегодня убирает домик 2?<br><b>Поставщик</b><br>Заказ на пятницу в силе?</div></div>
+    </article>
+    <article class="card pc">
+      <h3 class="h3">Склад в&nbsp;тетради</h3>
+      <p>Чай и&nbsp;шампунь заканчиваются в&nbsp;субботу, когда поставщик не&nbsp;отвечает.</p>
+      <div class="mini" aria-hidden="true"><div class="paper"><s>Шампунь — 3 л</s><br>Шампунь — ?<br><s>Чай — 2 коробки</s><br>Чай — кончился</div></div>
+    </article>
+  </div>
+</section>
+
+<!-- 3. Сегодня -->
+<section class="blk" id="features" aria-labelledby="h-today">
+  <div class="head">
+    <span class="eye">Экран «Сегодня»</span>
+    <h2 class="h2" id="h-today">Открыли утром&nbsp;— и&nbsp;понятно, что делать</h2>
+    <p class="lead">Заезды, выезды, срок МВД и&nbsp;то, что заканчивается на&nbsp;складе. У&nbsp;каждого дела своя кнопка.</p>
+  </div>
+  <div class="card app" aria-label="Пример экрана «Сегодня», имена и цифры вымышлены">
+    <div class="app-top"><b>Пятница, 6 ноября</b><span class="muted s">Загрузка 75% · занято 9 из 12 номеров</span></div>
+    <div>
+      <div class="col-t">Требует внимания</div>
+      <div class="row att"><div class="grow"><span class="tag">Сегодня</span><div class="t">Уведомить МВД о&nbsp;заселении</div><div class="muted">Анна Белова, купол 3</div></div><span class="mini-btn o">Отправлено</span></div>
+      <div class="row"><div class="grow"><div class="t">2 позиции не хватит на&nbsp;7 дней</div><div class="muted">Заказ по прогнозу броней</div></div><span class="mini-btn o">Сформировать заказ</span></div>
+      <div class="row"><div class="grow"><div class="t">Домик 2 ждет уборки</div><div class="muted">Выезд в 12:00</div></div><span class="mini-btn o">Убрано</span></div>
+    </div>
+    <div>
+      <div class="col-t">Заезды сегодня</div>
+      <div class="row"><div class="grow"><div class="t">Семья Котовых</div><div class="muted">Номер 5 · 2 взр. + 2 реб.</div></div><span class="mini-btn p">Заселить</span></div>
+      <div class="row"><div class="grow"><div class="t">Игорь Ланской</div><div class="muted">Номер 9 · 1 взр.</div></div><span class="mini-btn p">Заселить</span></div>
+      <div class="col-t" style="margin-top:20px">Выезды сегодня</div>
+      <div class="row"><div class="grow"><div class="t">Анна Седова</div><div class="muted">Домик 2 · до 12:00</div></div><span class="mini-btn o">Выселить</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Склад и закупки -->
+<section class="blk" id="stock" aria-labelledby="h-stock">
+  <div class="head">
+    <h2 class="h2" id="h-stock">Склад и&nbsp;закупки считают сами</h2>
+    <p class="lead">Один раз задаете нормы на&nbsp;гостя&nbsp;— дальше склад следит за&nbsp;расходом без тетради.</p>
+  </div>
+  <div class="split">
+    <div class="card stock" aria-label="Пример склада: остаток и потребность на 7 дней">
+      <div class="stock-top"><b class="h3">Хватит ли на&nbsp;7 дней</b><span class="muted s">по броням</span></div>
+      <div class="sr"><b>Чай черный, пакетики</b><span class="st ok">хватит</span><div class="track"><i style="transform:scaleX(1)"></i></div><span class="muted">есть 120 шт · нужно 84</span></div>
+      <div class="sr"><b>Шампунь</b><span class="st no">не хватит</span><div class="track"><i class="no" style="transform:scaleX(.67)"></i></div><span class="muted">есть 1,6 л · нужно 2,4</span></div>
+      <div class="sr"><b>Кофе молотый</b><span class="st no">не хватит</span><div class="track"><i class="no" style="transform:scaleX(.69)"></i></div><span class="muted">есть 0,9 кг · нужно 1,3</span></div>
+      <div class="sr"><b>Полотенца</b><span class="st ok">хватит</span><div class="track"><i style="transform:scaleX(1)"></i></div><span class="muted">есть 40 шт · нужно 28</span></div>
+      <span class="mini-btn p">Сформировать заказ</span>
+    </div>
+    <div class="flow">
+      <div class="card fc"><span class="num">1</span><h3 class="h3">Нормы</h3><p>Сколько уходит на&nbsp;одного гостя: чай, шампунь, полотенца.</p></div>
+      <div class="card fc"><span class="num">2</span><h3 class="h3">Списание при заезде</h3><p>Нажали «Заселить»&nbsp;— расход по&nbsp;брони списался сам.</p></div>
+      <div class="card fc"><span class="num">3</span><h3 class="h3">Заказ поставщику</h3><p>Чего не&nbsp;хватит на&nbsp;неделю, собирается в&nbsp;заказ.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. МВД -->
+<section class="blk" id="mvd" aria-labelledby="h-mvd">
+  <div class="head">
+    <span class="eye">Учет гостей</span>
+    <h2 class="h2" id="h-mvd">Срок уведомления МВД&nbsp;— на&nbsp;виду</h2>
+    <p class="lead">На&nbsp;следующий день после заезда на&nbsp;«Сегодня» появится задача. Она висит, пока вы не&nbsp;отметите отправку.</p>
+  </div>
+  <div class="three steps">
+    <article class="card mc">
+      <div class="day"><div class="cal" aria-hidden="true"><b>6</b><span class="s muted">ноя</span></div><span class="muted s">День заезда</span></div>
+      <h3 class="h3">Гость заселен</h3>
+      <p>Кнопка «Заселить» на&nbsp;«Сегодня» или в&nbsp;шахматке.</p>
+      <span class="pill n">Заезд</span>
+    </article>
+    <article class="card mc warn">
+      <div class="day"><div class="cal" aria-hidden="true"><b>7</b><span class="s muted">ноя</span></div><span class="muted s">Следующий день</span></div>
+      <h3 class="h3">Уведомить МВД до&nbsp;конца дня</h3>
+      <p>Задача на&nbsp;«Сегодня». Просрочку подсветим красным.</p>
+      <span class="pill w">+1 день к&nbsp;дате заезда</span>
+    </article>
+    <article class="card mc">
+      <div class="day"><div class="cal" aria-hidden="true"><b>✓</b></div><span class="muted s">Готово</span></div>
+      <h3 class="h3">Уведомление отправлено</h3>
+      <p>Отметка сохраняется в&nbsp;брони.</p>
+      <span class="pill g">Отмечено</span>
+    </article>
+  </div>
+  <p class="mvd-note s">Срок&nbsp;— следующий календарный день после заезда, для всех гостей. Это напоминание, а&nbsp;не&nbsp;юридическая консультация.</p>
+</section>
+
+<!-- 6. Команда -->
+<section class="blk" id="team" aria-labelledby="h-team">
+  <div class="head">
+    <h2 class="h2" id="h-team">У&nbsp;каждого в&nbsp;команде свое окно</h2>
+    <p class="lead">Приглашаете по&nbsp;почте и&nbsp;выбираете роль. Лишнего человек не&nbsp;увидит.</p>
+  </div>
+  <div class="three">
+    <article class="card rc">
+      <span class="av" aria-hidden="true">В</span>
+      <h3 class="h3">Владелец</h3>
+      <p>Все разделы: склад, закупки, уборка, аналитика, настройки и&nbsp;состав команды.</p>
+      <div class="acc" aria-label="Доступ"><span>Шахматка</span><span>Склад</span><span>Настройки</span></div>
+    </article>
+    <article class="card rc">
+      <span class="av" aria-hidden="true">У</span>
+      <h3 class="h3">Управляющий</h3>
+      <p>Дела на&nbsp;сегодня, шахматка, заезды и&nbsp;выезды, срок МВД.</p>
+      <div class="acc" aria-label="Доступ"><span>Шахматка</span><span class="x">Склад</span><span class="x">Настройки</span></div>
+    </article>
+    <article class="card rc">
+      <span class="av" aria-hidden="true">С</span>
+      <h3 class="h3">Сотрудник</h3>
+      <p>Например, горничная: дела на&nbsp;сегодня и&nbsp;шахматка. Склада, закупок и&nbsp;настроек нет.</p>
+      <div class="acc" aria-label="Доступ"><span>Шахматка: просмотр</span><span class="x">Склад</span><span class="x">Настройки</span></div>
+    </article>
+  </div>
+</section>
+
+<!-- 7. Уборка -->
+<section class="blk" id="cleaning" aria-labelledby="h-clean">
+  <div class="head">
+    <h2 class="h2" id="h-clean">Уборка на&nbsp;виду</h2>
+    <p class="lead">Выезд отправляет номер в&nbsp;уборку. Кнопка «Убрано» отмечает его чистым&nbsp;— без звонков и&nbsp;чатов.</p>
+  </div>
+  <div class="card clean" aria-label="Пример списка уборки">
+    <div class="clean-top"><b class="h3">Уборка, пятница</b><span class="chip">Убрано 1 из 3</span></div>
+    <div class="tiles">
+      <div class="cr"><div class="cr-h"><span class="dot"></span><b>Домик 2</b></div><div class="stt">Нужна уборка · выезд в 12:00</div><span class="mini-btn p">Убрано</span></div>
+      <div class="cr ok"><div class="cr-h"><span class="dot ok"></span><b>Купол 4</b></div><div class="stt">Чисто</div><span class="mini-btn o">Готов к заезду</span></div>
+      <div class="cr"><div class="cr-h"><span class="dot"></span><b>Домик 1</b></div><div class="stt">Нужна уборка</div><span class="mini-btn p">Убрано</span></div>
+    </div>
+    <div class="flowline" aria-hidden="true"><span>Выезд</span>→<span>Нужна уборка</span>→<span>Чисто</span></div>
+  </div>
+</section>
+
+<!-- 8. Пилот -->
+<section class="blk" id="pilot" aria-labelledby="h-pilot">
+  <div class="head">
+    <h2 class="h2" id="h-pilot">Пилот бесплатно</h2>
+    <p class="lead">Ищем глэмпинги и&nbsp;малые отели, которые начнут работать вместе с&nbsp;нами.</p>
+  </div>
+  <div class="three">
+    <article class="card pl"><span class="num" aria-hidden="true">1</span><h3 class="h3">Без оплаты</h3><p>На&nbsp;время пилота HoReCa Hub бесплатен.</p></article>
+    <article class="card pl"><span class="num" aria-hidden="true">2</span><h3 class="h3">Заведем вместе</h3><p>Поможем перенести номера, товары и&nbsp;нормы.</p></article>
+    <article class="card pl"><span class="num" aria-hidden="true">3</span><h3 class="h3">Ваши замечания первыми</h3><p>То, что мешает вам, попадает в&nbsp;продукт раньше остального.</p></article>
+  </div>
+</section>
+
+<!-- 9. Заявка -->
+<section class="blk forest" id="waitlist" aria-labelledby="h-wl">
+  <div class="head">
+    <span class="eye">Лист ожидания</span>
+    <h2 class="h2" id="h-wl">Расскажите про объект</h2>
+    <p class="lead">Оставьте почту&nbsp;— ответим в&nbsp;течение одного рабочего дня и&nbsp;покажем демо.</p>
+    <p class="contact s">Или напишите нам: <a href="mailto:support@hooreca.example">support@hooreca.example</a></p>
+  </div>
+  <form class="card form" id="wl" novalidate>
+    <fieldset>
+      <legend>Кто вы</legend>
+      <div class="seg">
+        <input type="radio" name="seg" id="sg1" value="owner" checked><label for="sg1">Владелец</label>
+        <input type="radio" name="seg" id="sg2" value="manager"><label for="sg2">Управляющий</label>
+      </div>
+    </fieldset>
+    <label class="l" for="em">Электронная почта</label>
+    <input class="inp" id="em" type="email" placeholder="you@glamping.ru" autocomplete="email" required>
+    <button class="btn btn-p" type="submit">Оставить заявку</button>
+    <p class="legal">Нажимая кнопку, вы соглашаетесь с&nbsp;<a href="../../../privacy">политикой конфиденциальности</a>.</p>
+    <p class="ok-msg" id="wlMsg" role="status" hidden></p>
+  </form>
+</section>
+
+</main>
+
+<footer class="ftr">
+  <div class="ftr-in">
+    <div><b>HoReCa Hub</b>Заезды, склад и срок МВД для глэмпингов и малых отелей.<br>Почта: support@hooreca.example</div>
+    <div><b>Продукт</b><a href="#features">Возможности</a><a href="#mvd">Срок МВД</a><a href="#waitlist">Заявка на пилот</a></div>
+    <div><b>Еще</b><a href="../../../privacy">Политика конфиденциальности</a><a href="../../../">Войти</a></div>
+    <div class="proto"><span>Имена и цифры в примерах вымышлены.</span><span>Прототип A · не продукт</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- заявка: прототип, никуда не отправляет ---------- */
+  var f=document.getElementById('wl'),m=document.getElementById('wlMsg');
+  f.addEventListener('submit',function(e){e.preventDefault();var v=document.getElementById('em').value.trim();
+    m.hidden=false;m.style.color=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)?'':'var(--danger-ink)';
+    m.textContent=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)?'Заявка принята. Мы напишем вам в течение одного рабочего дня. (Прототип: ничего не отправлено.)':'Проверьте почту: похоже, в адресе опечатка';});
+
+  /* ---------- живая сцена К1: курсор проводит заезд ---------- */
+  var scene=document.getElementById('scene'),grid=document.getElementById('grid'),
+      bk=document.getElementById('bk'),bkB=document.getElementById('bkB'),
+      cur=document.getElementById('cur'),curI=document.getElementById('curI'),ring=document.getElementById('ring'),
+      cntN=document.getElementById('cntN'),cntT=document.getElementById('cntT'),cnt=document.getElementById('cnt');
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mq=matchMedia('(max-width: 640px)');
+  var DAYS=[['чт',5],['пт',6],['сб',7],['вс',8],['пн',9],['вт',10],['ср',11]],TODAY=1;
+  var ROOMS=['Домик 1','Домик 2','Купол 3','Купол 4'];
+  var BK=[
+    {r:0,s:0,l:2,k:'in',n:'Орлов'},
+    {r:0,s:3,l:4,k:'ok',n:'Седова',g:'2 гостя'},
+    {r:1,s:1,l:3,k:'pend',n:'Ким',g:'2 гостя',id:'kim',card:['Ким, 2 гостя','Домик 2 · 6–9 ноября · 3 ночи']},
+    {r:2,s:0,l:3,k:'in',n:'Белова',g:'1 гость'},
+    {r:3,s:1,l:2,k:'pend',n:'Петрова',g:'1 гость',id:'pet',card:['Петрова, 1 гость','Купол 4 · 6–8 ноября · 2 ночи']},
+    {r:3,s:4,l:3,k:'ok',n:'Ланской'}
+  ];
+  var mob,D,R,targets,CYCLE,bars={};
+  var TICK='<svg class="tick" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8"/><path d="M4.6 8.2l2.2 2.2 4.6-4.6"/></svg>';
+
+  function build(){
+    mob=mq.matches;D=mob?4:7;R=mob?3:4;bars={};
+    grid.style.setProperty('--d',D);grid.style.setProperty('--r',R);
+    var h='<div></div>';
+    for(var d=0;d<D;d++)h+='<div class="gd'+(d===TODAY?' today':'')+'" style="grid-column:'+(d+2)+';grid-row:1">'+DAYS[d][0]+'<b>'+DAYS[d][1]+'</b></div>';
+    h+='<div class="todaycol" style="grid-column:'+(TODAY+2)+';grid-row:1/-1"></div>';
+    for(var r=0;r<R;r++){h+='<div class="gr" style="grid-column:1;grid-row:'+(r+2)+'">'+ROOMS[r]+'</div>';
+      for(d=0;d<D;d++)h+='<div class="gc" style="grid-column:'+(d+2)+';grid-row:'+(r+2)+'"></div>';}
+    BK.forEach(function(b){if(b.r>=R||b.s>=D)return;var e=Math.min(b.s+b.l,D),cut=b.s+b.l>D;
+      h+='<div class="bar'+(cut?' cut':'')+'" data-k="'+b.k+'"'+(b.id?' data-id="'+b.id+'"':'')+' style="grid-column:'+(b.s+2)+'/'+(e+2)+';grid-row:'+(b.r+2)+'">'+
+         '<span class="ly ly-ok"'+(b.k==='ok'?'':' hidden')+'></span><span class="ly ly-pend"'+(b.k==='pend'?'':' hidden')+'></span>'+(b.k!=='ok'?'<span class="ly ly-in"></span>':'')+
+         '<span class="bn">'+b.n+'</span>'+(b.g&&(e-b.s)>=3?'<span class="bgst">'+b.g+'</span>':'')+(b.k!=='ok'?TICK:'')+'</div>';});
+    grid.innerHTML=h;
+    BK.forEach(function(b){if(b.id){var el=grid.querySelector('[data-id="'+b.id+'"]');if(el)bars[b.id]={el:el,b:b};}});
+    grid.querySelectorAll('.bar[data-k="in"]').forEach(function(el){el.classList.add('go');});
+    targets=Object.keys(bars);cntT.textContent=targets.length;
+    CYCLE=mob?7000:11000;
+  }
+  function setIn(id,on){var t=bars[id];if(!t)return;t.el.setAttribute('data-k',on?'in':'pend');t.el.classList.toggle('go',on);}
+  function count(n){cntN.textContent=n;cnt.classList.toggle('done',n===targets.length);}
+  function finalFrame(){targets.forEach(function(id){setIn(id,true);});count(targets.length);scene.dataset.step='final';}
+
+  /* координаты внутри сцены по offset* (transform не влияет) */
+  function off(el){var x=0,y=0;while(el&&el!==scene){x+=el.offsetLeft;y+=el.offsetTop;el=el.offsetParent;}return{x:x,y:y};}
+  function barPt(id){var el=bars[id].el,o=off(el);return{x:o.x+Math.min(el.offsetWidth*.55,90),y:o.y+el.offsetHeight*.6};}
+  function btnPt(){var o=off(bkB);return{x:o.x+bkB.offsetWidth*.5,y:o.y+bkB.offsetHeight*.6};}
+  function park(){return{x:scene.clientWidth-40,y:scene.clientHeight-30};}
+  function placeCard(id){var b=bars[id];bk.querySelector('#bkN').textContent=b.b.card[0];bk.querySelector('#bkM').textContent=b.b.card[1];
+    bkB.classList.remove('done');if(mob)return;
+    var o=off(b.el),w=bk.offsetWidth,h=bk.offsetHeight,W=scene.clientWidth,H=scene.clientHeight;
+    var x=Math.max(12,Math.min(o.x+Math.min(b.el.offsetWidth*.5,110),W-w-12)),y=o.y+b.el.offsetHeight/2-h/2;
+    y=Math.max(12,Math.min(y,H-h-12));bk.style.left=x+'px';bk.style.top=y+'px';}
+
+  /* курсор: кубическая кривая + плавный разгон/торможение */
+  var pos={x:0,y:0},mv=null;
+  function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+  function setCur(p){pos=p;cur.style.transform='translate3d('+p.x.toFixed(1)+'px,'+p.y.toFixed(1)+'px,0)';}
+  function moveTo(p,dur){var a=pos,dx=p.x-a.x,dy=p.y-a.y,k=.22;
+    mv={a:a,b:p,c1:{x:a.x+dx*.3-dy*k,y:a.y+dy*.3+dx*k},c2:{x:a.x+dx*.8-dy*k*.4,y:a.y+dy*.8+dx*k*.4},t0:T,dur:dur};}
+  function stepMove(){if(!mv)return;var u=Math.min(1,(T-mv.t0)/mv.dur),t=ease(u),s=1-t,
+    x=s*s*s*mv.a.x+3*s*s*t*mv.c1.x+3*s*t*t*mv.c2.x+t*t*t*mv.b.x,y=s*s*s*mv.a.y+3*s*s*t*mv.c1.y+3*s*t*t*mv.c2.y+t*t*t*mv.b.y;
+    setCur({x:x,y:y});if(u>=1)mv=null;}
+  function click(el){curI.animate([{transform:'scale(1)'},{transform:'scale(.8)'},{transform:'scale(1)'}],{duration:240,easing:'ease-out'});
+    ring.animate([{opacity:.7,transform:'scale(.4)'},{opacity:0,transform:'scale(1.6)'}],{duration:450,easing:'ease-out'});
+    if(el)el.animate([{transform:'scale(1)'},{transform:'scale(.96)'},{transform:'scale(1)'}],{duration:220,easing:'ease-out'});}
+
+  /* таймлайн: один pausable-таймер на rAF */
+  var TL,idx=0,T=0,last=null,raf=0,running=false,done=0;
+  function timeline(){
+    var tl=[],at=0;
+    tl.push([0,function(){done=0;mv=null;setCur(park());cur.classList.add('on');scene.dataset.step='0';}]);
+    at=400;
+    targets.forEach(function(id,i){
+      tl.push([at,function(){scene.dataset.step=(i*4+1)+'';moveTo(barPt(id),850);}]);at+=850;
+      tl.push([at,function(){click(bars[id].el);}]);at+=160;
+      tl.push([at,function(){scene.dataset.step=(i*4+2)+'';placeCard(id);bk.classList.add('on');}]);at+=420;
+      tl.push([at,function(){moveTo(btnPt(),780);}]);at+=780;
+      tl.push([at,function(){scene.dataset.step=(i*4+3)+'';click(bkB);}]);at+=200;
+      tl.push([at,function(){scene.dataset.step=(i*4+4)+'';bkB.classList.add('done');setIn(id,true);count(++done);}]);at+=650;
+      tl.push([at,function(){bk.classList.remove('on');}]);at+=450;
+    });
+    tl.push([at,function(){moveTo(park(),900);}]);at+=900;
+    tl.push([at,function(){cur.classList.remove('on');scene.dataset.step='hold';}]);
+    tl.push([CYCLE-900,function(){scene.dataset.step='reset';targets.forEach(function(id){setIn(id,false);});count(0);}]);
+    return tl;
+  }
+  function frame(now){
+    if(last!==null)T+=Math.min(now-last,64);last=now;
+    while(idx<TL.length&&TL[idx][0]<=T){TL[idx][1]();idx++;}
+    stepMove();
+    if(T>=CYCLE){T=0;idx=0;}
+    raf=requestAnimationFrame(frame);
+  }
+  function play(){if(running||reduce)return;running=true;last=null;raf=requestAnimationFrame(frame);}
+  function pause(){running=false;cancelAnimationFrame(raf);}
+
+  function init(){
+    pause();build();bk.classList.remove('on');cur.classList.remove('on');
+    if(reduce){finalFrame();return;}
+    TL=timeline();T=0;idx=0;
+    targets.forEach(function(id){setIn(id,false);});count(0);
+    if(visible&&!document.hidden)play();
+  }
+  var visible=false;
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){visible=es[0].isIntersecting&&es[0].intersectionRatio>=.35;visible&&!document.hidden?play():pause();},{threshold:[0,.35,.6]}).observe(scene);
+  }else{visible=true;}
+  document.addEventListener('visibilitychange',function(){document.hidden?pause():(visible&&play());});
+  (mq.addEventListener?mq.addEventListener('change',init):mq.addListener(init));
+  init();
+})();
+</script>
+</body>
+</html>

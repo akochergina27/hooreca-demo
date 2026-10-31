@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Прототипы лендинга</title>
+<style>
+  @font-face { font-family: "Manrope"; src: url(fonts/manrope-cyrillic-wght-normal.woff2) format("woff2"); font-weight: 200 800; unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+  @font-face { font-family: "Manrope"; src: url(fonts/manrope-latin-wght-normal.woff2) format("woff2"); font-weight: 200 800; }
+  @font-face { font-family: "Golos"; src: url(fonts/golos-text-cyrillic-wght-normal.woff2) format("woff2"); font-weight: 400 900; unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+  @font-face { font-family: "Golos"; src: url(fonts/golos-text-latin-wght-normal.woff2) format("woff2"); font-weight: 400 900; }
+  :root { --bg: #f4f0e8; --fg: #1e2622; --muted: #5e6660; --primary: #2f5b45; --soft: #e1eae2; --border: #e3dccd; --card: #fbf9f4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 "Golos", system-ui, sans-serif; }
+  header { max-width: 1200px; margin: 0 auto; padding: 32px 16px 16px; display: flex; flex-wrap: wrap; gap: 16px; align-items: end; justify-content: space-between; }
+  h1 { font: 700 28px/1.2 "Manrope", system-ui, sans-serif; margin: 0 0 4px; }
+  p { margin: 0; color: var(--muted); }
+  .tabs, .sizes { display: flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; border: 1px solid var(--border); background: var(--card); color: var(--fg); border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+  button[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .bar { max-width: 1200px; margin: 0 auto; padding: 0 16px 16px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+  .desc { max-width: 1200px; margin: 0 auto; padding: 0 16px 16px; }
+  .stage { display: flex; justify-content: center; padding: 0 16px 48px; }
+  .frame { background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(30,38,34,.08); width: 390px; height: 844px; max-width: 100%; transition: width .2s; }
+  .frame.wide { width: 1440px; height: 900px; }
+  .scale { transform-origin: 0 0; }
+  iframe { border: 0; display: block; width: 100%; height: 100%; }
+  a { color: var(--primary); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Три прототипа лендинга</h1>
+    <p>Макеты для выбора направления. Не продукт. Правила и разбор — в docs/design/analysis.</p>
+  </div>
+</header>
+<div class="bar">
+  <div class="tabs" role="group" aria-label="Прототип">
+    <button data-p="a" aria-pressed="true">A · Старый, но чище</button>
+    <button data-p="b" aria-pressed="false">B · Ритм крупных заголовков</button>
+    <button data-p="c" aria-pressed="false">C · Интерфейс рассказывает сам</button>
+  </div>
+  <div class="sizes" role="group" aria-label="Ширина">
+    <button data-w="390" aria-pressed="true">390</button>
+    <button data-w="1440" aria-pressed="false">1440</button>
+    <a id="open" href="a/" target="_blank" rel="noopener">Открыть отдельно</a>
+  </div>
+</div>
+<p class="desc" id="desc"></p>
+<div class="stage"><div class="frame" id="frame"><div class="scale" id="scale"><iframe id="view" src="a/" title="Прототип"></iframe></div></div></div>
+<script>
+  var D = {
+    a: "Структура и воздух старого лендинга, новая палитра. Движение одно: на первом экране курсор сам проводит заезд на шахматке.",
+    b: "Один крупный заголовок на экран и 1–2 элемента. Живой первый экран, цифры и ключевые слова оживают при входе в кадр.",
+    c: "История гостя от брони до выезда. На каждом экране один живой мини-интерфейс: заезд, склад, срок МВД, уборка."
+  };
+  var p = "a", w = 390;
+  var frame = document.getElementById("frame"), scale = document.getElementById("scale"), view = document.getElementById("view");
+  function fit() {
+    var avail = document.documentElement.clientWidth - 32;
+    var fw = w === 1440 ? 1440 : 390, fh = w === 1440 ? 900 : 844;
+    var k = Math.min(1, avail / fw);
+    frame.style.width = fw * k + "px"; frame.style.height = fh * k + "px";
+    scale.style.width = fw + "px"; scale.style.height = fh + "px";
+    scale.style.transform = "scale(" + k + ")";
+  }
+  function render() {
+    document.querySelectorAll("[data-p]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.p === p); });
+    document.querySelectorAll("[data-w]").forEach(function (b) { b.setAttribute("aria-pressed", +b.dataset.w === w); });
+    if (view.getAttribute("src") !== p + "/") view.setAttribute("src", p + "/");
+    document.getElementById("open").href = p + "/";
+    document.getElementById("desc").textContent = D[p];
+    fit();
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.p) p = b.dataset.p; if (b.dataset.w) w = +b.dataset.w; render();
+  });
+  window.addEventListener("resize", fit);
+  render();
+</script>
+</body>
+</html>

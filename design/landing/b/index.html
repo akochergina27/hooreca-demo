@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HoReCa Hub — прототип B</title>
+<meta name="description" content="Прототип B лендинга HoReCa Hub: ритм «один экран — одна мысль», живой экран «Сегодня» и оживающие цифры.">
+<style>
+@font-face{font-family:"Manrope";src:url(../fonts/manrope-cyrillic-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Manrope";src:url(../fonts/manrope-latin-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap}
+@font-face{font-family:"Golos";src:url(../fonts/golos-text-cyrillic-wght-normal.woff2) format("woff2");font-weight:400 900;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Golos";src:url(../fonts/golos-text-latin-wght-normal.woff2) format("woff2");font-weight:400 900;font-display:swap}
+
+/* Токены «Лесной домик» — значения из src/index.css */
+:root{
+  --background:#f4f0e8;--foreground:#1e2622;--surface:#fbf9f5;--tone:#ede7db;--tone-strong:#e6dfd0;
+  --primary:#2f5b45;--primary-hover:#264b39;--primary-soft:#e1eae2;--primary-ink:#24473a;
+  --muted-foreground:#5e6660;--border:#e3dccd;--input-border:#857d6d;
+  --warning:#b07a1c;--warning-soft:#f4ead2;--warning-ink:#7a5512;
+  --success:#4e7a3a;--success-soft:#e6eedc;--success-ink:#3b5e2b;
+  --danger:#b4532a;--danger-soft:#f5e4d9;--danger-ink:#9a4421;
+  --r-control:12px;--r-card:16px;--r-section:20px;
+  --shadow-card:0 1px 2px rgb(60 48 30 / .05),0 6px 20px rgb(60 48 30 / .04);
+  --shadow-popover:0 2px 6px rgb(60 48 30 / .06),0 12px 32px rgb(60 48 30 / .08);
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --gap:120px;            /* зазор между экранами (R1, 390) */
+  --gutter:18px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--background);color:var(--foreground);font:400 16px/1.5 "Golos",system-ui,sans-serif;overflow-x:hidden}
+a{color:inherit}
+p{margin:0}
+h1,h2{margin:0;font-family:"Manrope",system-ui,sans-serif;font-weight:800;letter-spacing:-.025em;text-wrap:balance}
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 var(--gutter)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- кнопки ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:52px;padding:0 24px;border-radius:var(--r-control);font:600 16px/1 "Golos",sans-serif;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:transform .15s var(--ease),background-color .15s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-ghost{background:transparent;border-color:var(--input-border);color:var(--foreground)}
+.btn:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+
+/* ---------- шапка ---------- */
+.hdr{position:sticky;top:0;z-index:10;background:var(--background);border-bottom:1px solid var(--border)}
+.hdr .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font:800 18px/1 "Manrope",sans-serif;text-decoration:none;letter-spacing:-.01em}
+.brand svg{width:28px;height:28px}
+.hdr nav{display:none;gap:28px;font-size:15px}
+.hdr nav a{text-decoration:none;color:var(--muted-foreground)}
+.hdr nav a:hover{color:var(--foreground)}
+.hdr-cta{display:flex;gap:12px;align-items:center}
+.hdr .btn{height:40px;padding:0 16px;font-size:15px}
+.hdr .btn-primary{display:none}
+
+/* ---------- экраны ---------- */
+main{display:block}
+.scr{margin-top:var(--gap);scroll-margin-top:80px}
+.eyebrow{font:600 14px/1.3 "Golos",sans-serif;color:var(--primary-ink);letter-spacing:.01em;margin-bottom:16px}
+.h1{font-size:40px;line-height:1.08}
+.h2{font-size:34px;line-height:1.1;max-width:880px}
+.lead{font-size:17px;line-height:1.5;color:var(--muted-foreground);max-width:34em}
+.row{display:grid;grid-template-columns:minmax(0,1fr);gap:64px;margin-top:64px}
+.side{display:flex;flex-direction:column;gap:44px}
+.fact{font:800 112px/1 "Manrope",sans-serif;letter-spacing:-.04em;color:var(--primary);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fact small{font-size:.42em;letter-spacing:-.02em;margin-left:.12em}
+.cap{font-size:17px;line-height:1.4;color:var(--foreground);max-width:18em;margin-top:10px}
+
+/* ---------- карточки-макеты ---------- */
+.mock{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-section);box-shadow:var(--shadow-card);padding:20px;font-size:14px;line-height:1.35;overflow:hidden}
+.mock-h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.mock-t{font:700 16px/1.2 "Manrope",sans-serif}
+.mut{color:var(--muted-foreground)}
+.sm{font-size:12px}
+.chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.c-ok{background:var(--success-soft);color:var(--success-ink)}
+.c-warn{background:var(--warning-soft);color:var(--warning-ink)}
+.c-pr{background:var(--primary-soft);color:var(--primary-ink)}
+.c-tone{background:var(--tone);color:var(--muted-foreground)}
+.c-solid{background:var(--primary);color:#fff}
+.hr{height:1px;background:var(--border);margin:14px 0}
+
+/* ---------- 1. первый экран ---------- */
+.hero{margin-top:0;padding-top:28px}
+.hero .btn{padding:0 18px}
+@media (max-width:599px){.hero-note{display:none}.hero-grid{gap:48px}.hero-cta{margin-top:24px;gap:10px}}
+.hero-grid{display:grid;gap:40px}
+.hero .lead{margin-top:18px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.hero-note{margin-top:14px;font-size:14px;color:var(--muted-foreground)}
+
+/* Живая сцена «Сегодня» (кандидат К2) */
+.today{padding:0;position:relative}
+.t-head{display:flex;justify-content:space-between;align-items:flex-end;padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.t-title{font:800 22px/1.1 "Manrope",sans-serif}
+.t-date{font-size:13px;color:var(--muted-foreground);margin-bottom:4px}
+.t-count{display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--muted-foreground)}
+.t-num{font:800 30px/1 "Manrope",sans-serif;color:var(--primary);font-variant-numeric:tabular-nums}
+.t-list{list-style:none;margin:0;padding:6px 0;position:relative}
+.t-row{--h:62px;height:var(--h);display:grid;grid-template-columns:24px 1fr auto;gap:12px;align-items:center;padding:0 20px;background:var(--surface);position:relative;transition:transform .55s var(--ease)}
+.t-txt{min-width:0;transition:opacity .4s}
+.t-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-meta{font-size:12px;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.is-done .t-txt{opacity:.55}
+.t-row{z-index:1}
+.t-row.is-done{z-index:0}
+.tick{width:24px;height:24px;display:block;overflow:visible}
+.tick .c{fill:none;stroke:var(--input-border);stroke-width:1.5}
+.tick .f{fill:var(--primary);transform-origin:12px 12px;transition:opacity .25s,transform .35s var(--ease)}
+.tick .k{fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:16;stroke-dashoffset:0;transition:stroke-dashoffset .32s var(--ease) .12s}
+.t-st{position:relative;display:grid;justify-items:end}
+.t-st>span{grid-area:1/1;transition:opacity .3s,transform .3s var(--ease)}
+.t-st .b{display:none}
+.t-done{display:flex;align-items:center;gap:10px;margin:6px 14px 14px;padding:12px 14px;border-radius:var(--r-control);background:var(--success-soft);color:var(--success-ink);font-weight:600;font-size:14px;transition:opacity .4s,transform .4s var(--ease)}
+.t-done svg{width:18px;height:18px;flex:none}
+.odo{display:inline-block;height:1em;line-height:1;overflow:hidden;vertical-align:top}
+.odo-s{display:inline-block;white-space:pre;line-height:1;vertical-align:top}
+
+/* Состояния движения — только при class="motion" (reduce: финальный кадр, ничего не скрыто) */
+.motion .t-st .b{display:inline-flex}
+.motion .t-row:not(.is-done) .t-st .a{opacity:0;transform:translateY(6px)}
+.motion .t-row.is-done .t-st .b{opacity:0;transform:translateY(-6px)}
+.motion .t-row:not(.is-done) .tick .f{opacity:0;transform:scale(.5)}
+.motion .t-row:not(.is-done) .tick .k{stroke-dashoffset:16;transition-delay:0s}
+.motion .today:not(.all-done) .t-done{opacity:0;transform:translateY(12px)}
+.motion .odo-s{transition:transform 1.3s var(--ease)}
+.motion .t-num .odo-s{transition:transform .45s var(--ease)}
+.motion .nt,.motion .nt *{transition:none!important}
+
+/* Печать с кареткой (прием 1 для B) */
+.typed{position:relative;display:inline-block;white-space:nowrap}
+.caret{position:absolute;left:0;top:.1em;width:.08em;min-width:3px;height:.95em;background:var(--primary);border-radius:2px}
+.motion .typed .ch{opacity:0}
+.motion .typed.run .ch{opacity:1;transition:opacity 1ms linear calc(var(--i) * 70ms + 250ms)}
+/* Слово перетекает снизу */
+.rise{display:inline-block;white-space:nowrap;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em}
+.rise .ch{display:inline-block}
+.motion .rise .ch{transform:translateY(110%)}
+.motion .rise.run .ch{transform:none;transition:transform .7s var(--ease) calc(var(--i) * 38ms)}
+
+/* ---------- 2. Боль ---------- */
+.pain{display:grid;gap:0}
+.pain-col{padding:4px 0}
+.pain-col{background:var(--surface)}
+.pain-col+.pain-col{margin-top:14px;padding-top:16px;background:var(--surface) linear-gradient(var(--border),var(--border)) top/100% 1px no-repeat}
+.pain-k{font:700 15px/1.2 "Manrope",sans-serif;margin-bottom:10px}
+.line{display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:13px}
+.strike{text-decoration:line-through;text-decoration-color:var(--danger);color:var(--muted-foreground)}
+.bubble{background:var(--tone);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:13px;max-width:260px}
+.unread{display:inline-grid;place-items:center;min-width:28px;height:22px;border-radius:999px;background:var(--danger);color:#fff;font-size:12px;font-weight:700;padding:0 7px}
+
+/* ---------- 3. Шахматка ---------- */
+.cb-tabs{display:inline-flex;background:var(--tone);border-radius:10px;padding:3px;font-size:12px;font-weight:600}
+.cb-tabs span{padding:5px 10px;border-radius:8px}
+.cb-tabs span:first-child{background:var(--surface);box-shadow:var(--shadow-card)}
+.cb-row{display:grid;grid-template-columns:64px repeat(7,1fr);align-items:center;height:42px;position:relative}
+.cb-row+.cb-row{background:linear-gradient(var(--border),var(--border)) top/100% 1px no-repeat}
+.cb-days{height:32px;font-size:12px;color:var(--muted-foreground);text-align:center}
+.cb-days span:first-child{text-align:left}
+.cb-days .now{color:var(--primary-ink);font-weight:700}
+.cb-room{grid-column:1;font-size:12px;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px}
+.bk{grid-row:1;height:28px;border-radius:8px;font-size:11px;font-weight:600;display:flex;align-items:center;padding:0 7px;margin:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.bk-p{background:var(--warning-soft);color:var(--warning-ink)}
+.bk-c{background:var(--primary-soft);color:var(--primary-ink)}
+.bk-i{background:var(--primary);color:#fff}
+.cb-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;font-size:12px;color:var(--muted-foreground)}
+.cb-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.cb-today{position:absolute;top:0;bottom:0;background:rgb(47 91 69 / .06);border-radius:8px;pointer-events:none}
+
+/* ---------- 4. Склад ---------- */
+.st-tag{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-control);background:var(--primary-soft);color:var(--primary-ink);font-size:13px;font-weight:600;margin-bottom:8px}
+.st-row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:12px 0}
+.st-row+.st-row{background:linear-gradient(var(--border),var(--border)) top/100% 1px no-repeat}
+.st-name{font-weight:600;font-size:14px}
+.st-minus{font-weight:700;color:var(--primary-ink);font-variant-numeric:tabular-nums;text-align:right}
+.bar{grid-column:1/-1;height:6px;border-radius:99px;background:var(--tone-strong);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--primary);transform-origin:left}
+.bar.low i{background:var(--warning)}
+
+/* ---------- 5. Закупки ---------- */
+.or-line{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:12px 0}
+.or-line .bar{margin-top:2px}
+.or-line+.or-line{background:linear-gradient(var(--border),var(--border)) top/100% 1px no-repeat}
+.or-sum{display:flex;justify-content:space-between;align-items:center;padding:14px 0 16px;font-weight:700}
+.fake-btn{display:flex;align-items:center;justify-content:center;height:46px;border-radius:var(--r-control);background:var(--primary);color:#fff;font-weight:600;font-size:15px}
+
+/* ---------- 6. МВД (единственный акцентный фон) ---------- */
+.forest{background:var(--primary-ink);color:#fff;padding:72px 0}
+.forest .h2{color:#fff}
+.forest .lead{color:rgb(255 255 255 / .82)}
+.forest .fact{color:#fff}
+.forest .cap{color:rgb(255 255 255 / .92)}
+.forest .mock{color:var(--foreground);box-shadow:none;border-color:transparent}
+.task{display:grid;gap:10px}
+.task-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.task-t{font:700 17px/1.3 "Manrope",sans-serif}
+.task-days{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-top:10px}
+.day{border-radius:var(--r-control);background:var(--tone);padding:12px;font-size:13px}
+.day b{display:block;font-size:14px}
+.day.on{background:var(--warning-soft);color:var(--warning-ink)}
+.arrow{color:var(--muted-foreground);font-weight:700}
+.done-line{display:flex;align-items:center;gap:8px;margin-top:6px;padding:12px;border-radius:var(--r-control);background:var(--success-soft);color:var(--success-ink);font-weight:600;font-size:14px}
+
+/* ---------- 7. Команда ---------- */
+.mx{display:grid;grid-template-columns:minmax(0,1.25fr) repeat(3,minmax(0,1fr));align-items:center;font-size:13px}
+.mx>span{padding:11px 4px}
+.mx .hd{color:var(--muted-foreground);font-size:12px}
+.mx .rl{font-weight:600}
+.mx .y,.mx .v,.mx .n{justify-self:start}
+.mx .chip{padding:0 8px}
+.mx .rl{overflow:hidden;text-overflow:ellipsis}
+.mx .n{color:var(--muted-foreground)}
+.inv{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:16px;align-items:center}
+.inv-f{height:42px;border-radius:10px;border:1px solid var(--input-border);display:flex;align-items:center;padding:0 12px;font-size:13px;color:var(--muted-foreground);background:#fff;min-width:0;overflow:hidden;white-space:nowrap}
+.inv-b{height:42px;border-radius:10px;background:var(--primary);color:#fff;display:flex;align-items:center;padding:0 14px;font-weight:600;font-size:13px}
+
+/* ---------- 8. Заявка ---------- */
+.form{display:grid;gap:16px}
+.form fieldset{border:0;margin:0;padding:0;display:flex;gap:8px;flex-wrap:wrap}
+.form legend{font-size:14px;font-weight:600;margin-bottom:8px;padding:0}
+.seg{position:relative}
+.seg input{position:absolute;left:0;top:0;width:1px;height:1px;margin:0;clip-path:inset(50%);appearance:none}
+.seg span{display:inline-flex;align-items:center;height:42px;padding:0 16px;border-radius:10px;border:1px solid var(--input-border);font-size:15px;cursor:pointer}
+.seg input:checked+span{background:var(--primary-soft);border-color:var(--primary);color:var(--primary-ink);font-weight:600}
+.seg input:focus-visible+span{outline:3px solid var(--primary);outline-offset:2px}
+.form label.f{display:grid;gap:8px;font-size:14px;font-weight:600}
+.form input[type=email]{height:52px;border-radius:var(--r-control);border:1px solid var(--input-border);padding:0 14px;font:400 16px "Golos",sans-serif;background:#fff;color:var(--foreground);width:100%}
+.form .btn{width:100%}
+.legal{font-size:12px;color:var(--muted-foreground)}
+.ok{display:none;padding:12px 14px;border-radius:var(--r-control);background:var(--success-soft);color:var(--success-ink);font-weight:600;font-size:14px}
+.form.sent .ok{display:block}
+.mail-a{color:var(--primary-ink);font-weight:600}
+.legal a{color:inherit}
+.motion [data-bars]:not(.run) .bar i{transform:scaleX(1)!important}
+.motion [data-bars] .bar i{transition:transform .9s var(--ease)}
+.motion [data-bars] .st-row:nth-of-type(2) .bar i{transition-delay:.12s}
+.motion [data-bars] .st-row:nth-of-type(3) .bar i{transition-delay:.24s}
+.motion [data-bars] .st-row:nth-of-type(4) .bar i{transition-delay:.36s}
+.motion [data-bars] .st-row:nth-of-type(5) .bar i{transition-delay:.48s}
+
+/* ---------- подвал ---------- */
+.ftr{margin-top:var(--gap);border-top:1px solid var(--border);padding:40px 0 32px;font-size:14px;color:var(--muted-foreground)}
+.ftr .wrap{display:grid;gap:24px}
+.ftr-cols{display:flex;flex-wrap:wrap;gap:12px 28px}
+.ftr a{text-decoration:none}
+.ftr a:hover{color:var(--foreground)}
+.proto{font-size:12px;opacity:.85}
+
+/* ---------- планшет ---------- */
+@media (min-width:600px){
+  .wrap{max-width:680px}
+}
+/* ---------- десктоп ---------- */
+@media (min-width:1000px){
+  :root{--gap:232px;--gutter:32px}
+  .wrap{max-width:1184px}
+  .hdr .wrap{height:72px}
+  .hdr nav{display:flex}
+  .hdr .btn-primary{display:inline-flex}
+  .eyebrow{font-size:15px;margin-bottom:20px}
+  .h1{font-size:62px;line-height:1.05}
+  .lead{font-size:20px}
+  .cap{font-size:20px}
+  .hero{padding-top:64px}
+  .hero .btn{padding:0 24px}
+  .hero-grid{grid-template-columns:minmax(0,1fr) 540px;gap:56px;align-items:start}
+  .hero .lead{margin-top:24px}
+  .hero-cta{margin-top:32px}
+  .t-row{--h:68px}
+  .mock{padding:36px;font-size:15px}
+  .row{grid-template-columns:300px minmax(0,1fr);gap:48px;margin-top:72px;align-items:start}
+  .row.flip{grid-template-columns:minmax(0,1fr) 300px}
+  .row.flip .side{order:2}
+  .side{gap:32px}
+  .fact{font-size:168px}
+  .cap{margin-top:12px}
+  .row.fr{grid-template-columns:minmax(0,1fr) auto;align-items:end;margin-top:48px}
+  .fbox{text-align:right}
+  .fs .fact{font-size:220px}
+  .fs .cap{margin-left:auto}
+  .mock.form{gap:20px}
+  .h2{font-size:60px}
+  .cb-row{height:70px}
+  .bk{height:40px}
+  .cb-row{height:62px;grid-template-columns:96px repeat(7,1fr)}
+  .cb-days{height:40px}
+  .bk{height:38px}
+  .line,.bubble,.st-tag,.mx,.day,.inv-f,.inv-b,.t-name,.st-name,.done-line,.t-done{font-size:15px}
+  .sm,.chip,.t-meta,.t-date,.t-count,.cb-days,.cb-room,.bk,.cb-legend,.cb-tabs,.mx .hd,.unread,.legal{font-size:13px}
+  .hero-note{font-size:15px}
+  .pain{grid-template-columns:1fr}
+  .pain-col{display:grid;grid-template-columns:200px 1fr;column-gap:32px;align-items:start;padding:8px 0}
+  .pain-col>*:not(.pain-k){grid-column:2}
+  .pain-k{grid-row:1/span 4;font-size:17px}
+  .pain-col+.pain-col{margin-top:20px;padding-top:24px}
+  .forest{padding:96px 0}
+  .scr.forest{margin-top:136px}
+  .forest+.scr{margin-top:136px}
+  .st-row{padding:16px 0}
+  .or-line{padding:26px 0}
+  .mock-t{font-size:18px}
+  .mx>span{padding:22px 4px}
+  .inv{margin-top:20px}
+}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="HoReCa Hub, наверх">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#2f5b45"/><path d="M7 19.5 14 8l7 11.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M11.5 19.5h5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+      HoReCa Hub
+    </a>
+    <nav aria-label="Основная">
+      <a href="#features">Возможности</a>
+      <a href="#mvd">Срок МВД</a>
+      <a href="#waitlist">Заявка</a>
+    </nav>
+    <div class="hdr-cta">
+      <a class="btn btn-ghost" href="../../../">Войти</a>
+      <a class="btn btn-primary" href="#waitlist">Запросить демо</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 1. Первый экран: живой «Сегодня» -->
+<section class="scr hero" aria-labelledby="h-hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Для глэмпингов и малых отелей</p>
+      <h1 class="h1" id="h-hero">Заезды, склад и&nbsp;срок МВД&nbsp;— на&nbsp;одном экране</h1>
+      <p class="lead">Каждое утро HoReCa Hub собирает дела на сегодня, списывает расход по броням и напоминает о сроке уведомления МВД.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#waitlist">Запросить демо</a>
+        <a class="btn btn-ghost" href="../../../">Войти</a>
+      </div>
+      <p class="hero-note">Пилот бесплатно. Имена и цифры в примерах вымышлены.</p>
+    </div>
+
+    <div class="mock today" id="today" role="group" aria-label="Пример экрана «Сегодня»: четыре дела дня отмечаются выполненными">
+      <div class="t-head">
+        <div><p class="t-date">Пятница, 6 ноября</p><p class="t-title">Сегодня</p></div>
+        <div class="t-count">осталось <span class="t-num"><span class="odo"><span class="odo-s">0</span></span></span></div>
+      </div>
+      <ul class="t-list">
+        <li class="t-row is-done">
+          <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle class="c" cx="12" cy="12" r="10.5"/><circle class="f" cx="12" cy="12" r="11.2"/><path class="k" d="M7.2 12.4l3.2 3.2L16.9 9"/></svg>
+          <div class="t-txt"><p class="t-name">Заселить: семья Котовых</p><p class="t-meta">Номер 5 · 2 взр. + 2 реб.</p></div>
+          <span class="t-st"><span class="chip c-tone b" aria-hidden="true">Заселить</span><span class="chip c-pr a">В отеле</span></span>
+        </li>
+        <li class="t-row is-done">
+          <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle class="c" cx="12" cy="12" r="10.5"/><circle class="f" cx="12" cy="12" r="11.2"/><path class="k" d="M7.2 12.4l3.2 3.2L16.9 9"/></svg>
+          <div class="t-txt"><p class="t-name">Выезд: Орлов, домик 1</p><p class="t-meta">Номер уйдет в уборку</p></div>
+          <span class="t-st"><span class="chip c-tone b" aria-hidden="true">Выезд</span><span class="chip c-pr a">Выехал</span></span>
+        </li>
+        <li class="t-row is-done">
+          <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle class="c" cx="12" cy="12" r="10.5"/><circle class="f" cx="12" cy="12" r="11.2"/><path class="k" d="M7.2 12.4l3.2 3.2L16.9 9"/></svg>
+          <div class="t-txt"><p class="t-name">Уборка: домик 1</p><p class="t-meta">До заезда в 14:00</p></div>
+          <span class="t-st"><span class="chip c-warn b" aria-hidden="true">Нужна уборка</span><span class="chip c-ok a">Чисто</span></span>
+        </li>
+        <li class="t-row is-done">
+          <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle class="c" cx="12" cy="12" r="10.5"/><circle class="f" cx="12" cy="12" r="11.2"/><path class="k" d="M7.2 12.4l3.2 3.2L16.9 9"/></svg>
+          <div class="t-txt"><p class="t-name">Уведомить МВД</p><p class="t-meta">Анна Белова, купол 3 · до конца дня</p></div>
+          <span class="t-st"><span class="chip c-warn b" aria-hidden="true">Сегодня</span><span class="chip c-ok a">Отправлено</span></span>
+        </li>
+      </ul>
+      <p class="t-done"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7.2 12.4l3.2 3.2L16.9 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Все сделано. Хорошего дня</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Боль -->
+<section class="scr" aria-labelledby="h-pain">
+  <div class="wrap">
+    <h2 class="h2" id="h-pain">Excel, чаты и тетрадь <span class="typed" data-type>не&nbsp;договорятся</span></h2>
+    <div class="row">
+      <div class="side"><p class="lead">Все держится на памяти владельца — пока он не уехал в отпуск.</p></div>
+      <div class="vis">
+        <div class="mock pain" aria-label="Пример: брони в таблице, дела в чатах, склад в тетради">
+          <div class="pain-col">
+            <p class="pain-k">Брони в таблице</p>
+            <p class="line"><span>Пт · Домик 2 · Ким</span></p>
+            <p class="line"><span>Пт · Домик 2 · Ким, 2 гостя</span><span class="chip c-warn">дубль?</span></p>
+            <p class="line mut sm">Кто заезжает сегодня, знает тот, кто последним открывал файл.</p>
+          </div>
+          <div class="pain-col">
+            <p class="pain-k">Дела в чатах <span class="unread">37</span></p>
+            <p class="mut sm" style="margin-bottom:6px">Горничная</p>
+            <p class="bubble">Кто сегодня убирает домик 2?</p>
+            <p class="line mut sm">Уборка, поставщики и гости тонут в переписке за неделю.</p>
+          </div>
+          <div class="pain-col">
+            <p class="pain-k">Склад в тетради</p>
+            <p class="line"><span class="strike">Шампунь — 3 л</span></p>
+            <p class="line"><span>Шампунь — ?</span></p>
+            <p class="line mut sm">Чай и шампунь заканчиваются в субботу, когда поставщик не отвечает.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Шахматка -->
+<section class="scr" id="features" aria-labelledby="h-chess">
+  <div class="wrap">
+    <h2 class="h2" id="h-chess">Шахматка всегда <span class="rise" data-rise>в&nbsp;кармане</span></h2>
+    <div class="row flip">
+      <div class="side"><p class="lead">Сетка или список — прямо с телефона.</p></div>
+      <div class="vis">
+        <div class="mock" aria-label="Пример шахматки на неделю">
+          <div class="mock-h"><p class="mock-t">Шахматка · ноябрь</p><span class="cb-tabs" aria-hidden="true"><span>Сетка</span><span>Список</span></span></div>
+          <div class="cb">
+            <div class="cb-row cb-days"><span></span><span>Чт</span><span class="now">Пт</span><span>Сб</span><span>Вс</span><span>Пн</span><span>Вт</span><span>Ср</span></div>
+            <div class="cb-row"><span class="cb-room">Домик 1</span><span class="bk bk-i" style="grid-column:2/span 2">Орлов</span><span class="bk bk-c" style="grid-column:5/span 4">Седова</span></div>
+            <div class="cb-row"><span class="cb-room">Домик 2</span><span class="bk bk-p" style="grid-column:3/span 2">Ким</span></div>
+            <div class="cb-row"><span class="cb-room">Купол 3</span><span class="bk bk-i" style="grid-column:2/span 3">Белова</span></div>
+            <div class="cb-row"><span class="cb-room">Купол 4</span><span class="bk bk-c" style="grid-column:4/span 4">Ланской</span></div>
+            <div class="cb-row"><span class="cb-room">Номер 5</span><span class="bk bk-i" style="grid-column:3/span 3">Котовы</span><span class="bk bk-p" style="grid-column:7/span 2">Гусев</span></div>
+            <div class="cb-row"><span class="cb-room">Номер 6</span><span class="bk bk-c" style="grid-column:2/span 4">Зайцевы</span></div>
+          </div>
+          <p class="cb-legend"><span><i class="bk-p"></i>Ожидает</span><span><i class="bk-c"></i>Оплачено</span><span><i class="bk-i"></i>В отеле</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Склад: списание при заезде -->
+<section class="scr" aria-labelledby="h-stock">
+  <div class="wrap">
+    <h2 class="h2" id="h-stock">Склад списывает сам — при заезде</h2>
+    <div class="row">
+      <div class="side"><p class="lead">Нормы на гостя задаете один раз — дальше без тетради.</p></div>
+      <div class="vis">
+        <div class="mock" data-bars aria-label="Пример: списание по нормам при заезде">
+          <p class="st-tag">Заезд: семья Котовых · 2 взр. + 2 реб. · списано по нормам</p>
+          <div class="st-row"><span class="st-name">Чай черный, пакетики</span><span class="st-minus">−8 шт</span><span class="bar"><i style="transform:scaleX(.82)"></i></span><span class="mut sm">Осталось 112 шт · хватит</span></div>
+          <div class="st-row"><span class="st-name">Шампунь</span><span class="st-minus">−0,12 л</span><span class="bar low"><i style="transform:scaleX(.4)"></i></span><span class="mut sm">Осталось 1,48 л · не хватит</span></div>
+          <div class="st-row"><span class="st-name">Кофе молотый</span><span class="st-minus">−0,08 кг</span><span class="bar low"><i style="transform:scaleX(.46)"></i></span><span class="mut sm">Осталось 0,82 кг · не хватит</span></div>
+          <div class="st-row"><span class="st-name">Полотенца</span><span class="st-minus">−8 шт</span><span class="bar"><i style="transform:scaleX(.7)"></i></span><span class="mut sm">Осталось 32 шт · хватит</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Закупки -->
+<section class="scr fs" aria-labelledby="h-order">
+  <div class="wrap">
+    <h2 class="h2" id="h-order">Заказ поставщику — из&nbsp;того, чего не&nbsp;хватит</h2>
+    <div class="row fr">
+      <p class="lead">Чего не хватит, видно заранее. Заказ — одной кнопкой.</p>
+      <div class="fbox"><p class="fact"><span class="odo" data-odo="0-7"><span class="odo-s">7</span></span><small>дней</small></p><p class="cap">заказ по прогнозу броней на 7 дней</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. МВД -->
+<section class="scr forest fs" id="mvd" aria-labelledby="h-mvd">
+  <div class="wrap">
+    <h2 class="h2" id="h-mvd">Срок уведомления МВД — на&nbsp;виду</h2>
+    <div class="row fr">
+      <p class="lead">Задача на «Сегодня» висит, пока не отметите отправку.</p>
+      <div class="fbox"><p class="fact">+<span class="odo" data-odo="0-1"><span class="odo-s">1</span></span><small>день</small></p><p class="cap">к дате заезда — для всех гостей</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Команда -->
+<section class="scr" aria-labelledby="h-team">
+  <div class="wrap">
+    <h2 class="h2" id="h-team">У каждого в команде <span class="rise" data-rise>свое&nbsp;окно</span></h2>
+    <div class="row flip">
+      <div class="side"><p class="lead">Приглашаете по почте и выбираете роль.</p></div>
+      <div class="vis">
+        <div class="mock" aria-label="Пример: доступы по ролям">
+          <div class="mock-h"><p class="mock-t">Команда · доступы</p></div>
+          <div class="mx">
+            <span class="hd"></span><span class="hd">Шахматка</span><span class="hd">Склад</span><span class="hd">Настройки</span>
+            <span class="rl">Владелец</span><span class="chip c-ok y">есть</span><span class="chip c-ok y">есть</span><span class="chip c-ok y">есть</span>
+            <span class="rl">Управляющий</span><span class="chip c-ok y">есть</span><span class="n">—</span><span class="n">—</span>
+            <span class="rl">Сотрудник</span><span class="chip c-tone v">просмотр</span><span class="n">—</span><span class="n">—</span>
+          </div>
+          <div class="hr"></div>
+          <p class="mut sm">Пригласить в команду</p>
+          <div class="inv"><span class="inv-f">anna@glamping.ru · Управляющий</span><span class="inv-b">Пригласить</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. Заявка -->
+<section class="scr" id="waitlist" aria-labelledby="h-wait">
+  <div class="wrap">
+    <h2 class="h2" id="h-wait">Пилот бесплатно. Расскажите про объект</h2>
+    <div class="row">
+      <div class="side"><p class="lead">Ответим за один рабочий день. Или напишите: <a class="mail-a" href="mailto:support@hooreca.example">support@hooreca.example</a></p></div>
+      <div class="vis">
+        <form class="mock form" id="form" novalidate>
+          <p class="mock-t">Заявка на пилот</p>
+          <fieldset>
+            <legend>Кто вы</legend>
+            <label class="seg"><input type="radio" name="seg" value="owner" checked><span>Владелец</span></label>
+            <label class="seg"><input type="radio" name="seg" value="manager"><span>Управляющий</span></label>
+          </fieldset>
+          <label class="f">Электронная почта<input type="email" name="email" id="email" placeholder="you@glamping.ru" autocomplete="email" required></label>
+          <button class="btn btn-primary" type="submit">Оставить заявку</button>
+          <p class="ok" role="status">Заявка принята. Мы напишем вам в течение одного рабочего дня.</p>
+          <p class="legal">Нажимая кнопку, вы соглашаетесь с <a href="../../../privacy">политикой конфиденциальности</a>.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr-cols">
+      <strong style="color:var(--foreground)">HoReCa Hub</strong>
+      <span>Заезды, склад и срок МВД для глэмпингов и малых отелей</span>
+    </div>
+    <div class="ftr-cols">
+      <a href="#features">Возможности</a><a href="#mvd">Срок МВД</a><a href="#waitlist">Заявка на пилот</a><a href="../../../">Войти</a><a href="../../../privacy">Политика конфиденциальности</a>
+      <a href="mailto:support@hooreca.example">support@hooreca.example</a>
+    </div>
+    <div class="ftr-cols"><span>Имена и цифры в примерах вымышлены.</span><span class="proto">Прототип B · не продукт</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Форма: прототип, никуда не отправляет
+  var form = document.getElementById("form");
+  form.addEventListener("submit", function(e){ e.preventDefault(); form.classList.add("sent"); });
+  if (RM || !("IntersectionObserver" in window)) return; // финальные кадры уже в разметке
+  var root = document.documentElement;
+  root.classList.add("motion");
+  function reflow(el){ void el.offsetWidth; }
+  function noTrans(el, fn){ el.classList.add("nt"); fn(); reflow(el); el.classList.remove("nt"); }
+
+  /* ===== Живой первый экран: «Сегодня» отмечается галочками (К2) ===== */
+  var card = document.getElementById("today");
+  var rows = [].slice.call(card.querySelectorAll(".t-row"));
+  var strip = card.querySelector(".t-num .odo-s");
+  strip.textContent = "4\n3\n2\n1\n0";
+  var done = [], timers = [], playing = false;
+  function layout(){
+    var h = rows[0].offsetHeight;
+    var seq = rows.map(function(_, i){ return i; }).filter(function(i){ return done.indexOf(i) < 0; }).concat(done);
+    rows.forEach(function(r, i){
+      var slot = seq.indexOf(i);
+      r.style.transform = slot === i ? "" : "translateY(" + (slot - i) * h + "px)";
+      r.classList.toggle("is-done", done.indexOf(i) >= 0);
+    });
+    strip.style.transform = "translateY(" + (-done.length) + "em)";
+    card.setAttribute("data-step", done.length + (card.classList.contains("all-done") ? 1 : 0));
+  }
+  function at(ms, fn){ timers.push(setTimeout(fn, ms)); }
+  function stop(){ timers.forEach(clearTimeout); timers = []; }
+  function reset(){ done = []; card.classList.remove("all-done"); layout(); }
+  function cycle(){
+    reset();
+    [0, 1, 2, 3].forEach(function(i, k){ at(1000 + k * 1150, function(){ done.unshift(i); layout(); }); });
+    at(1000 + 3 * 1150 + 650, function(){ card.classList.add("all-done"); layout(); });
+    at(9200, cycle);           // держим «Все сделано» ~3.7 c, затем мягкий сброс и повтор
+  }
+  noTrans(card, reset);       // стартовый кадр до первой отрисовки
+  new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (e.isIntersecting && !playing){ playing = true; stop(); cycle(); }
+      else if (!e.isIntersecting && playing){ playing = false; stop(); noTrans(card, reset); }
+    });
+  }, {threshold: 0.35}).observe(card);
+  document.addEventListener("visibilitychange", function(){
+    if (document.hidden && playing){ playing = false; stop(); noTrans(card, reset); }
+    else if (!document.hidden){ var r = card.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight){ playing = true; stop(); cycle(); } }
+  });
+  addEventListener("resize", layout);
+
+  /* ===== Акценты экранов: один раз при входе в кадр, повтор при повторном входе ===== */
+  function split(el){
+    var txt = el.textContent; el.textContent = "";
+    for (var i = 0; i < txt.length; i++){
+      var s = document.createElement("span"); s.className = "ch"; s.style.setProperty("--i", i);
+      s.textContent = txt[i] === " " ? " " : txt[i]; el.appendChild(s);
+    }
+    return el.querySelectorAll(".ch");
+  }
+  var accents = [];
+  // Печать с кареткой
+  [].forEach.call(document.querySelectorAll("[data-type]"), function(el){
+    var chs = split(el);
+    var caret = document.createElement("span"); caret.className = "caret"; caret.setAttribute("aria-hidden", "true");
+    el.appendChild(caret);
+    var anim = null;
+    accents.push({ el: el,
+      run: function(){
+        el.classList.add("run");
+        var kf = [{ transform: "translateX(0)", opacity: 1, offset: 0 }];
+        var n = chs.length, step = 70, lead = 250, total = lead + n * step + 1800;
+        for (var i = 0; i < n; i++){
+          kf.push({ transform: "translateX(" + (chs[i].offsetLeft + chs[i].offsetWidth) + "px)", opacity: 1, offset: (lead + i * step) / total });
+        }
+        var endT = (lead + n * step) / total, x = "translateX(" + el.scrollWidth + "px)";
+        // мигнуть три раза и погаснуть
+        [0, 1, 2].forEach(function(k){
+          kf.push({ transform: x, opacity: 0, offset: endT + (k * 2 + 1) * 0.045 });
+          kf.push({ transform: x, opacity: 1, offset: endT + (k * 2 + 2) * 0.045 });
+        });
+        kf.push({ transform: x, opacity: 0, offset: Math.min(1, endT + 0.32) });
+        if (kf[kf.length - 1].offset < 1) kf.push({ transform: x, opacity: 0, offset: 1 });
+        anim = caret.animate(kf, { duration: total, easing: "step-end", fill: "forwards" });
+      },
+      reset: function(){ if (anim){ anim.cancel(); anim = null; } caret.style.opacity = ""; noTrans(el, function(){ el.classList.remove("run"); }); }
+    });
+  });
+  // Слово перетекает снизу
+  [].forEach.call(document.querySelectorAll("[data-rise]"), function(el){
+    split(el);
+    accents.push({ el: el,
+      run: function(){ el.classList.add("run"); },
+      reset: function(){ noTrans(el, function(){ el.classList.remove("run"); }); }
+    });
+  });
+  // Одометр ключевой цифры
+  [].forEach.call(document.querySelectorAll("[data-odo]"), function(el){
+    var p = el.getAttribute("data-odo").split("-").map(Number), a = p[0], b = p[1];
+    var s = el.querySelector(".odo-s"), seq = [];
+    for (var v = a; ; v += a < b ? 1 : -1){ seq.push(v); if (v === b) break; }
+    s.textContent = seq.join("\n");
+    var end = "translateY(" + (-(seq.length - 1)) + "em)";
+    accents.push({ el: el.closest(".fact"),
+      run: function(){ s.style.transform = end; },
+      reset: function(){ noTrans(el, function(){ s.style.transform = "translateY(0)"; }); }
+    });
+    s.style.transform = "translateY(0)";
+  });
+  // Полосы склада «списываются» при входе в кадр
+  [].forEach.call(document.querySelectorAll("[data-bars]"), function(el){
+    accents.push({ el: el, run: function(){ el.classList.add("run"); }, reset: function(){ noTrans(el, function(){ el.classList.remove("run"); }); } });
+  });
+  // Почта в форме печатается в подсказке
+  (function(){
+    var inp = document.getElementById("email"), full = inp.getAttribute("placeholder"), t = [];
+    accents.push({ el: inp,
+      run: function(){ for (var i = 0; i <= full.length; i++) (function(i){ t.push(setTimeout(function(){ inp.setAttribute("placeholder", full.slice(0, i) + (i < full.length ? "|" : "")); }, 300 + i * 70)); })(i); },
+      reset: function(){ t.forEach(clearTimeout); t = []; inp.setAttribute("placeholder", full); }
+    });
+  })();
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      var a = e.target.__acc; if (!a) return;
+      if (e.isIntersecting && !a.on){ a.on = true; a.run(); }
+      else if (!e.isIntersecting && a.on){ a.on = false; a.reset(); }
+    });
+  }, { threshold: 0.6 });
+  accents.forEach(function(a){ a.el.__acc = a; io.observe(a.el); });
+})();
+</script>
+</body>
+</html>
