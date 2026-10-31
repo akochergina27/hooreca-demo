@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HoReCa Hub — направление 2: Точный инструмент</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFFFFF;
+  --panel: #F7F7F8;
+  --hover: #EFEFF1;
+  --line: #E6E6E9;
+  --line-strong: #D6D6DB;
+  --text: #17171A;
+  --text-2: #5F5F67;
+  --text-3: #6B6B73;
+  --accent: #3355D6;
+  --accent-hover: #2A47B8;
+  --accent-soft: #EEF1FC;
+  --on-accent: #FFFFFF;
+  --danger: #B3362F;
+  --danger-soft: #FBEFEE;
+  --ok: #2B7A4B;
+  --ok-soft: #EDF6F0;
+  --kbd-bg: #FFFFFF;
+  --bar: #DADAE0;
+  --bar-peak: #3355D6;
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --bg: #111113;
+  --panel: #18181B;
+  --hover: #222226;
+  --line: #2A2A2F;
+  --line-strong: #37373D;
+  --text: #EDEDEF;
+  --text-2: #B4B4BC;
+  --text-3: #9C9CA5;
+  --accent: #4D6AE3;
+  --accent-hover: #5B77EA;
+  --accent-soft: #1C2340;
+  --on-accent: #FFFFFF;
+  --danger: #F08C85;
+  --danger-soft: #2C1A19;
+  --ok: #72C495;
+  --ok-soft: #16261D;
+  --kbd-bg: #1F1F23;
+  --bar: #34343B;
+  --bar-peak: #7C93F0;
+  color-scheme: dark;
+}
+[data-theme="dark"] .link, [data-theme="dark"] .accent-text { color: #8EA2F2; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+svg { display: block; flex-shrink: 0; }
+
+/* служебная плашка */
+.strip {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 6px 16px; font-size: 12px; color: var(--text-3);
+  border-bottom: 1px solid var(--line); background: var(--panel);
+}
+.strip a { color: var(--text-2); text-decoration: none; white-space: nowrap; }
+.strip a:hover { color: var(--text); }
+
+.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: calc(100vh - 29px);
+  background: linear-gradient(to right, var(--panel) 235px, var(--line) 235px, var(--line) 236px, var(--bg) 236px); }
+
+/* сайдбар */
+.side {
+  background: var(--panel); border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; padding: 14px 10px 12px;
+  position: sticky; top: 0; height: calc(100vh - 29px);
+}
+.brand { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; padding: 4px 10px 12px; }
+.property {
+  display: flex; align-items: center; justify-content: space-between;
+  border: 1px solid var(--line); background: var(--bg); border-radius: 7px;
+  padding: 7px 10px; margin: 0 0 16px; cursor: pointer; font-size: 13px; font-weight: 500;
+}
+.property .dot { width: 8px; height: 8px; border-radius: 2px; background: var(--ok); margin-right: 8px; }
+.property span { display: flex; align-items: center; }
+.nav { display: flex; flex-direction: column; gap: 1px; }
+.nav a {
+  display: flex; align-items: center; gap: 10px; text-decoration: none;
+  padding: 6px 10px; border-radius: 6px; color: var(--text-2); font-size: 13.5px;
+}
+.nav a:hover { background: var(--hover); color: var(--text); }
+.nav a.active { background: var(--bg); color: var(--text); font-weight: 500; box-shadow: inset 0 0 0 1px var(--line); }
+.nav a.active svg { color: var(--accent); }
+[data-theme="dark"] .nav a.active { background: var(--hover); }
+[data-theme="dark"] .nav a.active svg { color: #8EA2F2; }
+.nav .count { margin-left: auto; font-size: 12px; color: var(--text-3); min-width: 18px; text-align: right; }
+.nav .key { margin-left: auto; }
+.nav hr { border: 0; border-top: 1px solid var(--line); margin: 8px 10px; }
+.me {
+  margin-top: auto; display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px 2px; border-top: 1px solid var(--line); font-size: 13px;
+}
+.avatar {
+  width: 26px; height: 26px; border-radius: 6px; background: var(--hover);
+  border: 1px solid var(--line); display: grid; place-items: center;
+  font-size: 11.5px; font-weight: 600; color: var(--text-2);
+}
+.me small { display: block; color: var(--text-3); font-size: 12px; }
+
+/* kbd */
+kbd {
+  font-family: inherit; font-size: 11px; font-weight: 500; line-height: 1;
+  color: var(--text-3); background: var(--kbd-bg);
+  border: 1px solid var(--line-strong); border-bottom-width: 1.5px;
+  border-radius: 4px; padding: 3px 5px; min-width: 18px; text-align: center; display: inline-block;
+}
+.btn-primary kbd { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.35); color: #fff; }
+
+/* верхняя строка */
+.top {
+  display: flex; align-items: center; gap: 10px; padding: 10px 28px;
+  border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 5;
+}
+.search {
+  flex: 1; max-width: 520px; display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px 6px 10px;
+  color: var(--text-3); background: var(--panel); font-size: 13.5px; cursor: text;
+}
+.search span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top .spacer { flex: 1; }
+.seg {
+  display: inline-flex; border: 1px solid var(--line); border-radius: 7px; padding: 2px; background: var(--panel);
+}
+.seg button {
+  border: 0; background: transparent; padding: 3px 9px; border-radius: 5px; font-size: 12.5px;
+  color: var(--text-3); cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--bg); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; cursor: pointer;
+  font-size: 13px; font-weight: 500; padding: 5px 10px; white-space: nowrap;
+  border: 1px solid var(--line-strong); background: var(--bg);
+}
+.btn:hover { background: var(--hover); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); padding: 6px 8px 6px 11px; }
+.btn-primary:hover { background: var(--accent-hover); }
+.icon-btn {
+  width: 32px; height: 32px; display: grid; place-items: center; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--bg); cursor: pointer; color: var(--text-2); position: relative;
+}
+.icon-btn:hover { background: var(--hover); }
+.icon-btn .pip { position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* контент */
+.main { min-width: 0; }
+.content { max-width: 1120px; padding: 28px 28px 56px; }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.022em; line-height: 1.15; margin: 0 0 6px; }
+.sub { color: var(--text-2); font-size: 14px; display: flex; flex-wrap: wrap; gap: 4px 0; }
+.sub b { font-weight: 600; color: var(--text); }
+.sub i { font-style: normal; color: var(--text-3); padding: 0 8px; }
+.ask { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; font-size: 12.5px; color: var(--text-3); }
+.chip {
+  border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 3px 8px;
+  font-size: 12.5px; color: var(--text-2); cursor: pointer; white-space: nowrap;
+}
+.chip:hover { border-color: var(--line-strong); color: var(--text); }
+
+.section { margin-top: 28px; }
+.section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+h2 { font-size: 13px; font-weight: 600; margin: 0; letter-spacing: 0; }
+h2 .n { color: var(--text-3); font-weight: 500; margin-left: 6px; }
+.section-h .meta { font-size: 12.5px; color: var(--text-3); }
+.link { color: var(--accent); text-decoration: none; font-weight: 500; font-size: 13px; white-space: nowrap; }
+.link:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+.box { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--bg); }
+
+/* требует внимания */
+.attn .row {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  padding: 12px 14px 12px 12px; border-top: 1px solid var(--line);
+}
+.attn .row:first-child { border-top: 0; }
+.attn .ico {
+  width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center;
+  background: var(--panel); border: 1px solid var(--line); color: var(--text-2);
+}
+.attn .ico.urgent { background: var(--danger-soft); border-color: transparent; color: var(--danger); }
+.attn .title { font-weight: 500; font-size: 14px; }
+.attn .desc { color: var(--text-2); font-size: 13px; margin-top: 1px; }
+.attn .desc .due { color: var(--danger); font-weight: 500; }
+.attn .actions { display: flex; align-items: center; gap: 8px; }
+.attn .row.first { box-shadow: inset 2px 0 0 var(--danger); }
+
+/* три колонки */
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.col { border-left: 1px solid var(--line); min-width: 0; display: flex; flex-direction: column; }
+.col:first-child { border-left: 0; }
+.col-h {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 9px 14px; border-bottom: 1px solid var(--line); background: var(--panel);
+  font-size: 13px; font-weight: 600;
+}
+.col-h .n { color: var(--text-3); font-weight: 500; }
+.col-h .hint { font-weight: 400; font-size: 12px; color: var(--text-3); }
+.li {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  padding: 9px 14px; border-bottom: 1px solid var(--line); min-height: 54px;
+}
+.li:last-child { border-bottom: 0; }
+.li:hover { background: var(--panel); }
+.li .who { font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.li .what { font-size: 12.5px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.li .what .sep { color: var(--line-strong); padding: 0 5px; }
+[data-theme="dark"] .li .what .sep { color: var(--text-3); }
+.time { font-size: 13px; color: var(--text); font-weight: 500; }
+.tag {
+  font-size: 12px; padding: 2px 7px; border-radius: 5px; white-space: nowrap; font-weight: 500;
+  border: 1px solid var(--line); color: var(--text-2);
+}
+.tag.debt { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+.btn-sm { font-size: 12.5px; padding: 3px 8px; border-radius: 5px; }
+.right { display: flex; align-items: center; gap: 10px; }
+.check {
+  width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--line-strong); display: grid; place-items: center;
+}
+.check.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+.li.done .who { color: var(--text-3); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+.col-f {
+  margin-top: auto; padding: 10px 14px; border-top: 1px solid var(--line);
+  display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-2);
+}
+.progress { flex: 1; height: 4px; background: var(--hover); border-radius: 2px; overflow: hidden; }
+.progress i { display: block; height: 100%; width: 25%; background: var(--accent); border-radius: 2px; }
+
+/* метрики */
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m { padding: 14px 16px 15px; border-left: 1px solid var(--line); min-width: 0; }
+.m:first-child { border-left: 0; }
+.m .label { font-size: 12.5px; color: var(--text-2); }
+.m .val { font-size: 20px; font-weight: 600; letter-spacing: -0.015em; margin: 4px 0 3px; white-space: nowrap; }
+.m .val small { font-size: 14px; font-weight: 500; color: var(--text-2); }
+.m .note { font-size: 12.5px; color: var(--text-3); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.delta { color: var(--ok); font-weight: 500; display: inline-flex; align-items: center; gap: 3px; }
+.meter { display: flex; gap: 2px; margin-top: 2px; }
+.meter i { flex: 1; height: 6px; border-radius: 1px; background: var(--ok); opacity: .75; }
+.meter i.low { background: var(--danger); opacity: .85; }
+
+/* неделя */
+.week { display: grid; grid-template-columns: minmax(0, 1fr) 280px; }
+.chart { padding: 16px 18px 12px; min-width: 0; }
+.chart svg { width: 100%; height: 172px; overflow: visible; }
+.chart text { font-family: inherit; font-variant-numeric: tabular-nums; }
+.week-note {
+  border-left: 1px solid var(--line); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+  font-size: 13px; color: var(--text-2);
+}
+.week-note strong { color: var(--text); font-weight: 500; display: block; font-size: 14px; margin-bottom: 2px; }
+.week-note .legend { margin-top: auto; display: flex; gap: 14px; font-size: 12px; color: var(--text-3); }
+.week-note .legend span { display: inline-flex; align-items: center; gap: 6px; }
+.week-note .legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+
+.bottom-nav, .m-prop { display: none; }
+
+/* мобильная */
+@media (max-width: 1100px) {
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .m:nth-child(3) { border-left: 0; }
+  .m:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .week { grid-template-columns: 1fr; }
+  .week-note { border-left: 0; border-top: 1px solid var(--line); }
+  .head { flex-direction: column; align-items: flex-start; }
+  .ask { justify-content: flex-start; }
+}
+@media (max-width: 960px) {
+  .cols { grid-template-columns: 1fr; }
+  .col { border-left: 0; border-top: 1px solid var(--line); }
+  .col:first-child { border-top: 0; }
+}
+@media (max-width: 767px) {
+  body { font-size: 14px; padding-bottom: 64px; }
+  .strip { padding: 6px 16px; flex-wrap: wrap; }
+  .strip .long { display: none; }
+  .app { grid-template-columns: 1fr; min-height: 0; background: var(--bg); }
+  .side { display: none; }
+  .top { padding: 8px 16px; gap: 8px; }
+  .top { flex-wrap: wrap; }
+  .m-prop { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; }
+  .m-prop .dot { width: 8px; height: 8px; border-radius: 2px; background: var(--ok); }
+  .m-prop { margin-right: auto; }
+  .search { max-width: none; min-width: 0; order: 8; flex: 1 1 calc(100% - 100px); }
+  .top .btn-primary { order: 9; }
+  .search kbd { display: none; }
+  .btn-primary kbd, .top .bell { display: none; }
+  .sub { font-size: 13px; }
+  .btn-primary { padding: 6px 10px; }
+  .seg button { padding: 3px 7px; }
+  .content { padding: 18px 16px 32px; }
+  h1 { font-size: 24px; }
+  .sub i { padding: 0 6px; }
+  .section { margin-top: 24px; }
+  .attn .row { grid-template-columns: 28px minmax(0, 1fr); }
+  .attn .actions { grid-column: 2; }
+  .attn .actions kbd { display: none; }
+  .metrics { grid-template-columns: 1fr 1fr; }
+  .m { padding: 12px; }
+  .m .val { font-size: 18px; }
+  .chart { padding: 12px 10px 8px; }
+  .bottom-nav {
+    display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+    background: var(--panel); border-top: 1px solid var(--line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+  .bottom-nav a {
+    display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none;
+    font-size: 11.5px; color: var(--text-3); position: relative; padding: 2px 0;
+  }
+  .bottom-nav a.active { color: var(--text); font-weight: 500; }
+  .bottom-nav a.active svg { color: var(--accent); }
+  [data-theme="dark"] .bottom-nav a.active svg { color: #8EA2F2; }
+  .bottom-nav .b {
+    position: absolute; top: -2px; left: calc(50% + 6px); font-size: 10.5px; line-height: 1;
+    background: var(--text); color: var(--bg); border-radius: 8px; padding: 2px 5px; font-weight: 600;
+  }
+}
+@media (max-width: 420px) {
+  .metrics { grid-template-columns: 1fr; }
+  .m { border-left: 0 !important; }
+  .m:nth-child(n+2) { border-top: 1px solid var(--line); }
+  .m { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: baseline; }
+  .m .label { grid-column: 1; }
+  .m .val { grid-column: 2; grid-row: 1 / span 2; margin: 0; text-align: right; }
+  .m .note { grid-column: 1; }
+  .m .meter { grid-column: 1 / -1; margin-top: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="strip">
+  <span>Мокап направления 2: Точный инструмент<span class="long"> · статичный макет, данные вымышлены · HoReCa Hub</span></span>
+  <a href="./index.html">← все направления</a>
+</div>
+
+<div class="app">
+  <aside class="side" aria-label="Навигация">
+    <div class="brand">HoReCa Hub</div>
+    <div class="property" role="button" aria-label="Сменить объект">
+      <span><i class="dot"></i>Лесная поляна</span>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+    </div>
+    <nav class="nav">
+      <a href="#" class="active">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1"/></svg>
+        Сегодня
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M6 6.5v7M10 6.5v7"/></svg>
+        Шахматка
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13.5h10M4.5 13.5l1-6h5l1 6M6.5 7.5V2.5h3v5"/></svg>
+        Уборка <span class="count">4</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5L8 2.5l6 3v7l-6 3-6-3z"/><path d="M2 5.5l6 3 6-3M8 8.5v7"/></svg>
+        Склад <span class="count">3</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 2.5h2l1.6 8h7.4l1.5-5.5H4.3"/><circle cx="6" cy="13.5" r="1"/><circle cx="12" cy="13.5" r="1"/></svg>
+        Закупки
+      </a>
+      <hr>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13.5h11M4 11V8M8 11V4M12 11V6.5"/></svg>
+        Аналитика
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5h6M11.5 4.5h2M2.5 11.5h2M7.5 11.5h6"/><circle cx="10" cy="4.5" r="1.5"/><circle cx="6" cy="11.5" r="1.5"/></svg>
+        Настройки
+      </a>
+    </nav>
+    <div class="me">
+      <div class="avatar">ВК</div>
+      <div>Владимир К.<small>владелец</small></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="m-prop"><i class="dot"></i>Лесная поляна<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></div>
+      <div class="search" role="search">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
+        <span>Найти гостя, номер, товар или действие…</span>
+        <kbd>⌘K</kbd>
+      </div>
+      <div class="spacer"></div>
+      <div class="seg" role="group" aria-label="Тема">
+        <button type="button" data-set="light" aria-pressed="true">Светлая</button>
+        <button type="button" data-set="dark" aria-pressed="false">Темная</button>
+      </div>
+      <button class="btn btn-primary" type="button">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>
+        Бронь <kbd>N</kbd>
+      </button>
+      <button class="icon-btn bell" type="button" aria-label="Уведомления">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5V7a4 4 0 018 0v4.5l1 1H3z"/><path d="M6.5 14a1.5 1.5 0 003 0"/></svg>
+        <i class="pip"></i>
+      </button>
+    </header>
+
+    <main class="content">
+      <div class="head">
+        <div>
+          <h1>Пятница, 31 октября</h1>
+          <div class="sub"><span>Загрузка <b>75%</b></span><i>·</i><span><b>9</b> из 12 домиков заняты</span><i>·</i><span><b>18</b> гостей</span></div>
+        </div>
+        <div class="ask">
+          <span>Спросите:</span>
+          <button class="chip" type="button">Что закончится на этой неделе?</button>
+          <button class="chip" type="button">Себестоимость завтрака в октябре</button>
+        </div>
+      </div>
+
+      <!-- Блок 1 -->
+      <section class="section" style="margin-top:22px">
+        <div class="section-h">
+          <h2>Требует внимания<span class="n">2</span></h2>
+        </div>
+        <div class="box attn">
+          <div class="row first">
+            <div class="ico urgent">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>
+            </div>
+            <div>
+              <div class="title">Уведомление МВД: гость Сергей Орлов (домик 7)</div>
+              <div class="desc">Отправить <span class="due">до 12:00 завтра</span></div>
+            </div>
+            <div class="actions">
+              <kbd>E</kbd>
+              <button class="btn btn-primary" type="button" style="padding:5px 11px">Отметить отправленным</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="ico">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5L8 2.5l6 3v7l-6 3-6-3z"/><path d="M2 5.5l6 3 6-3M8 8.5v7"/></svg>
+            </div>
+            <div>
+              <div class="title">Сахар-стик и кофе в капсулах закончатся через 2 дня</div>
+              <div class="desc">Склад · по текущему расходу на 18 гостей</div>
+            </div>
+            <div class="actions">
+              <kbd>A</kbd>
+              <button class="btn" type="button">Добавить в заказ</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Блок 2 -->
+      <section class="section">
+        <div class="section-h">
+          <h2>Сегодня</h2>
+          <span class="meta">3 заезда · 2 выезда · 4 уборки</span>
+        </div>
+        <div class="box cols">
+          <div class="col">
+            <div class="col-h"><span>Заезды <span class="n">· 3</span></span><span class="hint">с 14:00</span></div>
+            <div class="li">
+              <div><div class="who">Анна Белова</div><div class="what">Шале 2<span class="sep">/</span>2 взр.</div></div>
+              <div class="right"><span class="time">14:00</span><button class="btn btn-sm" type="button">Заселить</button></div>
+            </div>
+            <div class="li">
+              <div><div class="who">Семья Котовых</div><div class="what">Купол 5<span class="sep">/</span>2 взр. + 2 реб.</div></div>
+              <div class="right"><span class="time">15:00</span><button class="btn btn-sm" type="button">Заселить</button></div>
+            </div>
+            <div class="li">
+              <div><div class="who">Игорь Ланской</div><div class="what">Домик 9<span class="sep">/</span>1 взр.</div></div>
+              <div class="right"><span class="time">18:30</span><button class="btn btn-sm" type="button">Заселить</button></div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="col-h"><span>Выезды <span class="n">· 2</span></span><span class="hint">до 12:00</span></div>
+            <div class="li">
+              <div><div class="who">Мария Соколова</div><div class="what">Купол 3<span class="sep">/</span>до 12:00</div></div>
+              <div class="right"><span class="tag">оплачено</span></div>
+            </div>
+            <div class="li">
+              <div><div class="who">Дмитрий Петров</div><div class="what">Шале 1<span class="sep">/</span>до 12:00</div></div>
+              <div class="right"><span class="tag debt">долг 2 400 ₽</span></div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="col-h"><span>Уборка <span class="n">· 4</span></span><span class="hint">Ольга</span></div>
+            <div class="li done">
+              <div><div class="who">Купол 3</div><div class="what">после выезда</div></div>
+              <div class="right"><span class="check done"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5l2.5 2.5 4.5-6"/></svg></span></div>
+            </div>
+            <div class="li">
+              <div><div class="who">Шале 1</div><div class="what">после выезда</div></div>
+              <div class="right"><span class="check"></span></div>
+            </div>
+            <div class="li">
+              <div><div class="who">Домик 4</div><div class="what">текущая</div></div>
+              <div class="right"><span class="check"></span></div>
+            </div>
+            <div class="li">
+              <div><div class="who">Купол 6</div><div class="what">текущая</div></div>
+              <div class="right"><span class="check"></span></div>
+            </div>
+            <div class="col-f"><span>1 из 4 готово</span><div class="progress"><i></i></div><span>Ольга</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Блок 3 -->
+      <section class="section">
+        <div class="section-h">
+          <h2>Деньги и склад за октябрь</h2>
+          <a class="link" href="#">Аналитика →</a>
+        </div>
+        <div class="box metrics">
+          <div class="m">
+            <div class="label">Выручка</div>
+            <div class="val">1 284 000 <small>₽</small></div>
+            <div class="note"><span class="delta">+9%</span> к сентябрю</div>
+          </div>
+          <div class="m">
+            <div class="label">Себестоимость гостя в сутки</div>
+            <div class="val">412 <small>₽</small></div>
+            <div class="note"><span class="delta">−6%</span> к сентябрю</div>
+          </div>
+          <div class="m">
+            <div class="label">Закупка на 7 дней</div>
+            <div class="val">18 400 <small>₽</small></div>
+            <div class="note"><a class="link" href="#" style="font-size:12.5px">Сформировать заказ →</a></div>
+          </div>
+          <div class="m">
+            <div class="label">Склад в норме</div>
+            <div class="val">41 <small>из 44</small></div>
+            <div class="note">3 позиции ниже минимума</div>
+            <div class="meter" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="low"></i><i class="low"></i><i class="low"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Блок 4 -->
+      <section class="section">
+        <div class="section-h">
+          <h2>Неделя вперед</h2>
+          <a class="link" href="#">Шахматка →</a>
+        </div>
+        <div class="box week">
+          <div class="chart">
+            <svg viewBox="0 0 560 170" role="img" aria-label="Загрузка на 7 дней: пт 75%, сб 100%, вс 92%, пн 42%, вт 33%, ср 50%, чт 67%">
+              <g stroke="var(--line)" stroke-width="1">
+                <line x1="0" y1="20" x2="560" y2="20" stroke-dasharray="2 3"/>
+                <line x1="0" y1="70" x2="560" y2="70" stroke-dasharray="2 3"/>
+                <line x1="0" y1="120" x2="560" y2="120"/>
+              </g>
+              <g id="bars"></g>
+            </svg>
+          </div>
+          <div class="week-note">
+            <div><strong>В субботу полная загрузка</strong>Проверьте запас полотенец и дров.</div>
+            <div class="legend">
+              <span><i style="background:var(--bar-peak)"></i>100%</span>
+              <span><i style="background:var(--text-3)"></i>сегодня</span>
+              <span><i style="background:var(--bar)"></i>прочие дни</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav" aria-label="Навигация">
+  <a href="#" class="active">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1"/></svg>Сегодня</a>
+  <a href="#"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M6 6.5v7M10 6.5v7"/></svg>Шахматка</a>
+  <a href="#"><span class="b">4</span><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13.5h10M4.5 13.5l1-6h5l1 6M6.5 7.5V2.5h3v5"/></svg>Уборка</a>
+  <a href="#"><span class="b">3</span><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5L8 2.5l6 3v7l-6 3-6-3z"/><path d="M2 5.5l6 3 6-3M8 8.5v7"/></svg>Склад</a>
+  <a href="#"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 2.5h2l1.6 8h7.4l1.5-5.5H4.3"/><circle cx="6" cy="13.5" r="1"/><circle cx="12" cy="13.5" r="1"/></svg>Закупки</a>
+</nav>
+
+<script>
+(function () {
+  // столбики недели (статичные данные мокапа)
+  var d = [["пт", 75], ["сб", 100], ["вс", 92], ["пн", 42], ["вт", 33], ["ср", 50], ["чт", 67]];
+  var g = document.getElementById("bars"), svg = g.ownerSVGElement;
+  function draw() {
+  var W = Math.max(280, Math.round(svg.getBoundingClientRect().width)), w = W / 7, bw = Math.min(40, w * 0.56), h = 100, base = 120, out = "";
+  svg.setAttribute("viewBox", "0 0 " + W + " 170");
+  svg.querySelectorAll("line").forEach(function (l) { l.setAttribute("x2", W); });
+  d.forEach(function (p, i) {
+    var x = i * w + (w - bw) / 2, bh = p[1] / 100 * h, y = base - bh;
+    var fill = p[1] === 100 ? "var(--bar-peak)" : (i === 0 ? "var(--text-3)" : "var(--bar)");
+    var label = p[1] === 100 ? "var(--accent)" : "var(--text)";
+    out += '<rect x="' + x + '" y="' + y + '" width="' + bw + '" height="' + bh + '" rx="3" fill="' + fill + '"/>';
+    out += '<text x="' + (x + bw / 2) + '" y="' + (y - 7) + '" text-anchor="middle" font-size="12.5" font-weight="500" fill="' + label + '">' + p[1] + '%</text>';
+    out += '<text x="' + (x + bw / 2) + '" y="' + (base + 20) + '" text-anchor="middle" font-size="12.5" fill="var(--text-2)"' + (i === 0 ? ' font-weight="600"' : '') + '>' + p[0] + '</text>';
+    if (i === 0) out += '<text x="' + (x + bw / 2) + '" y="' + (base + 37) + '" text-anchor="middle" font-size="11.5" fill="var(--text-3)">сегодня</text>';
+  });
+  g.innerHTML = out;
+  }
+  draw(); window.addEventListener("resize", draw);
+
+  // переключатель темы
+  var root = document.documentElement, btns = document.querySelectorAll("[data-set]");
+  function set(t) {
+    root.setAttribute("data-theme", t);
+    btns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-set") === t)); });
+  }
+  btns.forEach(function (b) { b.addEventListener("click", function () { set(b.getAttribute("data-set")); }); });
+  var q = location.hash.match(/theme=(dark|light)/);
+  if (q) set(q[1]);
+})();
+</script>
+</body>
+</html>

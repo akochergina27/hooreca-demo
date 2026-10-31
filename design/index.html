@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HoReCa Hub — три направления дизайна</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#F6F6F4; --card:#FFFFFF; --text:#1A1A1A; --muted:#5C5C5C; --line:#E3E3E0; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 Inter, system-ui, sans-serif; }
+  main { max-width:1040px; margin:0 auto; padding:56px 16px 72px; }
+  h1 { font-size:32px; line-height:1.2; font-weight:600; margin:0 0 12px; letter-spacing:-0.01em; }
+  .lead { color:var(--muted); max-width:640px; margin:0 0 40px; }
+  .grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+  a.card { display:flex; flex-direction:column; gap:14px; background:var(--card); border:1px solid var(--line);
+           border-radius:12px; padding:24px; text-decoration:none; color:inherit; transition:border-color .15s; }
+  a.card:hover, a.card:focus-visible { border-color:#9A9A96; outline:none; }
+  .swatches { display:flex; gap:6px; }
+  .swatches span { width:28px; height:28px; border-radius:6px; border:1px solid rgba(0,0,0,.08); }
+  .num { color:var(--muted); font-size:14px; }
+  h2 { margin:0; font-size:20px; font-weight:600; }
+  p { margin:0; color:var(--muted); font-size:15px; }
+  .open { margin-top:auto; font-weight:500; font-size:15px; }
+  .note { margin-top:40px; color:var(--muted); font-size:14px; }
+  @media (max-width: 820px) { .grid { grid-template-columns:1fr; } main { padding-top:32px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Три направления дизайна HoReCa Hub</h1>
+  <p class="lead">Один и тот же экран «Сегодня» для владельца, одни и те же данные — разный характер.
+  Откройте каждое, в том числе с телефона, и выберите то, что ближе по вкусу. Данные вымышлены, макеты статичные.</p>
+  <div class="grid">
+    <a class="card" href="./1-len.html">
+      <div class="swatches"><span style="background:#FAF8F4"></span><span style="background:#23211F"></span><span style="background:#A9502F"></span></div>
+      <div class="num">Направление 1</div>
+      <h2>Лен и графит</h2>
+      <p>Эволюция нынешнего бренда. Спокойная редакционная подача: теплая бумага, графит, приглушенная терракота, serif-заголовки.</p>
+      <span class="open">Открыть →</span>
+    </a>
+    <a class="card" href="./2-tochno.html">
+      <div class="swatches"><span style="background:#FFFFFF"></span><span style="background:#17171A"></span><span style="background:#3355D6"></span></div>
+      <div class="num">Направление 2</div>
+      <h2>Точный инструмент</h2>
+      <p>Современный рабочий софт. Нейтральные тона, один кобальтовый акцент, плотные списки, быстрый поиск, есть темная тема.</p>
+      <span class="open">Открыть →</span>
+    </a>
+    <a class="card" href="./3-les.html">
+      <div class="swatches"><span style="background:#F4F0E8"></span><span style="background:#1E2622"></span><span style="background:#2F5B45"></span></div>
+      <div class="num">Направление 3</div>
+      <h2>Лесной домик</h2>
+      <p>Теплый и человечный, про загородный отдых. Песок и лесной зеленый, мягкие секции, крупные кнопки, удобно с телефона.</p>
+      <span class="open">Открыть →</span>
+    </a>
+  </div>
+  <p class="note">Подробности и обоснование — в документе концепции (docs/design/CONCEPT.md в основном репозитории).</p>
+</main>
+</body>
+</html>
