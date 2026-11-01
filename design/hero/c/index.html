@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HoReCa Hub — герой C: одно касание</title>
+<style>
+@font-face{font-family:"Manrope";src:url(../fonts/manrope-cyrillic-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Manrope";src:url(../fonts/manrope-latin-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Golos";src:url(../fonts/golos-text-cyrillic-wght-normal.woff2) format("woff2");font-weight:400 900;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Golos";src:url(../fonts/golos-text-latin-wght-normal.woff2) format("woff2");font-weight:400 900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Caveat";src:url(../fonts/caveat-cyrillic-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Caveat";src:url(../fonts/caveat-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+/* Токены «Лесной домик» — значения из src/index.css */
+:root{
+  --bg:#f4f0e8;--fg:#1e2622;--surface:#fbf9f5;--tone:#ede7db;--tone-strong:#e6dfd0;--muted:#5e6660;
+  --primary:#2f5b45;--primary-hover:#264b39;--primary-soft:#e1eae2;--primary-ink:#24473a;
+  --warning:#b07a1c;--warning-soft:#f4ead2;--warning-ink:#7a5512;
+  --success:#4e7a3a;--success-soft:#e6eedc;--success-ink:#3b5e2b;
+  --danger-soft:#f5e4d9;--danger-ink:#9a4421;
+  --border:#e3dccd;--input-border:#857d6d;--pencil:#3a3f3b;
+  --shadow-card:0 1px 2px rgb(60 48 30 / .05),0 6px 20px rgb(60 48 30 / .04);
+  --shadow-pop:0 2px 6px rgb(60 48 30 / .06),0 12px 32px rgb(60 48 30 / .08);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --ease-io:cubic-bezier(.5,0,.2,1);
+  --gut:16px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.5 "Golos",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+p,dl,dd{margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+.wrap{width:100%;max-width:1224px;margin:0 auto;padding:0 var(--gut)}
+
+/* Шапка */
+.top .wrap{height:60px;display:flex;align-items:center;gap:18px}
+.logo{display:flex;align-items:center;gap:8px;margin-right:auto;font:700 17px/1 "Manrope",sans-serif;letter-spacing:-.01em;text-decoration:none}
+.logo i{width:20px;height:20px;border-radius:6px;background:var(--primary);position:relative}
+.logo i::after{content:"";position:absolute;left:5px;right:5px;bottom:5px;height:5px;border-radius:2px 2px 0 0;background:var(--primary-soft)}
+.login{font-size:15px;font-weight:500;text-decoration:none;color:var(--fg)}
+.login:hover{color:var(--primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 22px;border-radius:12px;font:500 16px/1 "Golos",sans-serif;text-decoration:none;white-space:nowrap;background:var(--primary);color:#fff;transition:background .2s}
+.btn:hover{background:var(--primary-hover)}
+.top .btn{height:38px;padding:0 14px;font-size:14px;border-radius:10px}
+
+/* Текст героя */
+.hero{padding:20px 0 40px}
+.eyebrow{font-size:14px;font-weight:500;color:var(--primary-ink);margin-bottom:12px}
+h1{margin:0;font:650 40px/1.06 "Manrope",system-ui,sans-serif;letter-spacing:-.025em;text-wrap:balance}
+.lead{color:var(--muted);margin-top:16px;max-width:640px}
+.ctas{display:flex;align-items:center;gap:22px;margin-top:20px}
+.ctas .login{font-size:16px}
+
+/* Сцена */
+.scene{margin-top:28px;position:relative}
+.stage{position:relative}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;font-size:13px;color:var(--muted)}
+.pz{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--fg);display:grid;place-items:center;cursor:pointer;padding:0}
+.pz:hover{border-color:var(--input-border)}
+.pz svg{width:14px;height:14px}
+.pz .i-play{display:none}
+.pz[aria-pressed="true"] .i-play{display:block}
+.pz[aria-pressed="true"] .i-pause{display:none}
+.reduce .pz{display:none}
+.ghost{position:absolute;left:0;top:0;width:100%;opacity:0;transition:opacity .6s var(--ease);pointer-events:none;z-index:20}
+.nt,.nt *{transition:none!important;animation:none!important}
+
+/* Линии-связи */
+.wires{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+.wires path{fill:none;stroke:var(--border);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke-dashoffset .55s var(--ease-io)}
+.wires circle{fill:var(--primary);opacity:0;transition:opacity .25s linear}
+
+/* Карточка брони */
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-card);padding:16px;font-size:14px;overflow:hidden}
+.bdg{display:inline-grid;justify-items:start}
+.bdg>span{grid-area:1/1;display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:500;transition:opacity .3s linear}
+.b-w{background:var(--warning-soft);color:var(--warning-ink)}
+.b-i{background:var(--success-soft);color:var(--success-ink);opacity:0}
+.nm{font:650 20px/1.2 "Manrope",sans-serif;letter-spacing:-.015em;margin:8px 0 10px}
+.kv{display:grid;grid-template-columns:64px 1fr;gap:5px 10px}
+.kv dt{color:var(--muted)}
+.kv .m{color:var(--muted);margin-left:6px}
+.cta{position:relative;display:grid;place-items:center;height:44px;margin-top:14px;border-radius:12px;background:var(--primary);color:#fff;font-weight:500;font-size:15px;transition:opacity .3s linear,transform .15s var(--ease)}
+.cta>span{grid-area:1/1;transition:opacity .2s linear}
+.cta .c2,.cta .c3{opacity:0}
+.hint{display:grid}.hint>span{grid-area:1/1;transition:opacity .3s linear}.hint .h2t{opacity:0}
+.hint{color:var(--muted);font-size:12.5px;margin-top:8px}
+.cardw{position:relative;z-index:3}
+.toast{position:absolute;left:12px;right:12px;top:calc(100% + 10px);z-index:4;display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-pop);font-weight:500;opacity:0;transform:translateY(12px);transition:opacity .3s var(--ease),transform .4s var(--ease)}
+.ok{flex:none;width:22px;height:22px;border-radius:50%;background:var(--success-soft);color:var(--success-ink);display:grid;place-items:center}
+.ok svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.tap{position:absolute;z-index:9;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--fg);opacity:0;pointer-events:none}
+.tap.go{animation:tap .5s var(--ease)}
+@keyframes tap{0%{opacity:0;transform:scale(.5)}30%{opacity:.18;transform:scale(.8)}100%{opacity:0;transform:scale(1.25)}}
+.press{transform:scale(.97)}
+
+/* Следствия */
+.cs{position:relative;z-index:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px;font-size:14px;line-height:1.4}
+.ct{transition:opacity .4s var(--ease),transform .4s var(--ease);opacity:0;transform:translateY(6px)}
+.sk{position:absolute;inset:12px 14px;display:flex;flex-direction:column;gap:9px;transition:opacity .3s linear}
+.sk i{display:block;height:10px;border-radius:5px;background:var(--tone-strong)}
+.cs-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.nx{font-weight:400;font-size:12px;color:var(--muted)}
+.mini{display:grid;grid-template-columns:62px repeat(4,1fr);grid-template-rows:20px 36px;font-size:12px;align-items:center}
+.mini .dh{text-align:center;color:var(--muted)}
+.mini .rm{color:var(--muted)}
+.mpl{grid-column:2/6;grid-row:2;display:grid;height:28px;margin:0 2px}
+.mpl>span{grid-area:1/1;display:flex;align-items:center;padding:0 9px;border-radius:8px;border:1px solid;border-left-width:3px;font-weight:500;font-size:13px;transition:opacity .4s linear}
+.k-wait{background:var(--warning-soft);color:var(--warning-ink);border-color:rgb(176 122 28 / .4);border-left-color:var(--warning)}
+.k-in{background:var(--success-soft);color:var(--success-ink);border-color:rgb(78 122 58 / .4);border-left-color:var(--success);opacity:0}
+.st{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.st-n{font-weight:600;font-size:15px;color:var(--fg)}
+.st-r{color:var(--muted);font-size:13px}
+.st-v{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.num{font:600 20px/1 "Manrope",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.odo{display:inline-grid;overflow:hidden;vertical-align:bottom}
+.odo>span{grid-area:1/1;transition:transform .45s var(--ease),opacity .3s linear}
+.odo>span.in{transform:translateY(60%);opacity:0}
+.odo>span.out{transform:translateY(-60%);opacity:0}
+.ok-b{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:500;background:var(--success-soft);color:var(--success-ink)}
+.it-r{display:flex;gap:12px;align-items:flex-start}
+.ic{flex:none;width:36px;height:36px;border-radius:14px;background:var(--primary-soft);color:var(--primary-ink);display:grid;place-items:center}
+.ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.it-t{font-weight:500;color:var(--fg)}
+.it-d{color:var(--muted);font-size:13px;margin-top:2px}
+
+/* Карандашные записи — иллюстрация «как было бы в тетради» */
+.note{position:relative;z-index:1;font:400 23px/1 "Caveat",cursive;color:var(--pencil);margin:18px 0 6px}
+.note span{position:relative;display:inline-block}
+.note span::after{content:"";position:absolute;left:-4px;right:-4px;top:54%;height:1.8px;border-radius:2px;background:var(--pencil);transform:rotate(-2.5deg) scaleX(0);transform-origin:left center;transition:transform .45s var(--ease-io)}
+
+/* Состояния */
+.busy .c1{opacity:0}.busy .c2{opacity:1}
+.done .cta{background:var(--surface);color:var(--fg);box-shadow:inset 0 0 0 1px var(--input-border)}.done .c1{opacity:0}.done .c3{opacity:1}.done .h1t{opacity:0}.done .h2t{opacity:1}
+.done .b-w{opacity:0}.done .b-i{opacity:1}
+.toast-on .toast{opacity:1;transform:none}
+.r1 .cs1 .ct,.r2 .cs2 .ct,.r3 .cs3 .ct{opacity:1;transform:none}
+.r1 .cs1 .sk,.r2 .cs2 .sk,.r3 .cs3 .sk{opacity:0}
+.r1 .d1,.r2 .d2,.r3 .d3{opacity:1}
+.tone-in .k-in{opacity:1}
+.tone-in .mpl .k-wait{opacity:0}
+.x1 .n1 span::after,.x2 .n2 span::after,.x3 .n3 span::after{transform:rotate(-2.5deg) scaleX(1)}
+
+/* Телефон: карточка сверху, следствия столбиком под ней, линия слева */
+.cs,.note{margin-left:34px}
+.card{margin-bottom:4px}
+
+@media (min-width:600px){:root{--gut:32px}}
+@media (min-width:768px){
+  .top .wrap{height:68px;gap:28px}
+  .top .btn{height:40px;padding:0 16px;font-size:15px}
+  .hero{padding-top:40px}
+  .eyebrow{font-size:15px;margin-bottom:16px}
+  .lead{font-size:17px}
+}
+/* Десктоп: текст по центру, ниже карточка слева и три следствия справа */
+@media (min-width:960px){
+  .copy{text-align:center;display:flex;flex-direction:column;align-items:center}
+  h1{font-size:clamp(52px,3.4vw + 16px,66px)}
+  .lead{margin-top:18px}
+  .ctas{margin-top:26px}
+  .btn{height:52px;padding:0 26px}
+  .scene{margin-top:44px}
+  .stage{display:grid;grid-template-columns:330px minmax(170px,210px) 1fr;grid-template-rows:repeat(3,auto);row-gap:14px;align-items:center}
+  .cardw{grid-column:1;grid-row:1/4}
+  .card{margin:0}
+  .cs{grid-column:3;margin:0}
+  .cs1{grid-row:1}.cs2{grid-row:2}.cs3{grid-row:3}
+  .note{grid-column:2;margin:0 0 0 30px;align-self:center;transform:translateY(-22px)}
+  .n1{grid-row:1}.n2{grid-row:2}.n3{grid-row:3}
+  .cs3 .it-d{max-width:520px}
+}
+@media (min-width:1200px){.stage{grid-template-columns:360px 230px 1fr}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="#"><i aria-hidden="true"></i>HoReCa Hub</a>
+  <a class="login" href="#">Войти</a>
+  <a class="btn" href="#waitlist">Запросить демо</a>
+</div></header>
+
+<main class="hero"><div class="wrap">
+  <div class="copy">
+    <p class="eyebrow">Программа для отеля, гостиницы и глэмпинга</p>
+    <h1>Одно касание вместо трех записей.</h1>
+    <p class="lead">Нажали «Заселить» — гость в отеле, расход со склада посчитан, а на следующий день на экране «Сегодня» появится срок уведомления МВД.</p>
+    <div class="ctas"><a class="btn" href="#waitlist">Запросить демо</a><a class="login" href="#">Войти</a></div>
+  </div>
+
+  <div class="scene" id="scene">
+    <div class="stage" role="img" aria-label="Карточка брони Анны Смирновой: после нажатия «Заселить» бронь на шахматке становится «В отеле», остаток мыла на складе уменьшается с 30 до 24, а на следующий день на экране «Сегодня» появляется срок уведомления МВД. Три записи в тетради зачеркиваются.">
+      <svg class="wires" aria-hidden="true"><path class="w1"/><path class="w2"/><path class="w3"/><circle class="d1" r="3.5"/><circle class="d2" r="3.5"/><circle class="d3" r="3.5"/></svg>
+
+      <div class="cardw" aria-hidden="true">
+        <div class="card">
+        <span class="bdg"><span class="b-w">Ожидает</span><span class="b-i">В отеле</span></span>
+        <p class="nm">Анна Смирнова</p>
+        <dl class="kv">
+          <dt>Номер</dt><dd>3</dd>
+          <dt>Даты</dt><dd>6 ноября — 9 ноября<span class="m">3 ночи</span></dd>
+          <dt>Гости</dt><dd>2 взр.</dd>
+        </dl>
+        <span class="cta"><span class="c1">Заселить</span><span class="c2">Оформляем...</span><span class="c3">Выселить</span></span>
+        <p class="hint"><span class="h1t">Заезд спишет товары со склада по нормам расхода.</span><span class="h2t">После выезда номер уйдет в уборку.</span></p>
+        <i class="tap"></i>
+        </div>
+        <div class="toast"><span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Заезд оформлен</div>
+      </div>
+
+      <p class="note n1" aria-hidden="true"><span>Смирнова заехала</span></p>
+      <div class="cs cs1" aria-hidden="true">
+        <div class="sk"><i style="width:26%"></i><i style="width:100%;height:28px;border-radius:8px;margin-top:12px"></i></div>
+        <div class="ct">
+          <p class="cs-h">Шахматка</p>
+          <div class="mini">
+            <span></span><span class="dh">Пт 6</span><span class="dh">Сб 7</span><span class="dh">Вс 8</span><span class="dh">Пн 9</span>
+            <span class="rm">Номер 3</span>
+            <span class="mpl"><span class="k-wait">Смирнова</span><span class="k-in">Смирнова</span></span>
+          </div>
+        </div>
+      </div>
+
+      <p class="note n2" aria-hidden="true"><span>мыло −6</span></p>
+      <div class="cs cs2" aria-hidden="true">
+        <div class="sk"><i style="width:18%"></i><i style="width:24%;height:12px"></i><i style="width:58%"></i></div>
+        <div class="ct">
+          <p class="cs-h">Склад</p>
+          <div class="st">
+            <div><p class="st-n">Мыло</p><p class="st-r">Расход: 1 шт на 1 гостя в сутки</p></div>
+            <div class="st-v"><span class="num"><span class="odo"><span>30</span></span> шт</span><span class="ok-b">Хватает</span></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="note n3" aria-hidden="true"><span>МВД до 7-го</span></p>
+      <div class="cs cs3" aria-hidden="true">
+        <div class="sk"><i style="width:44%"></i><i style="width:86%;margin-top:6px"></i><i style="width:92%"></i><i style="width:64%"></i></div>
+        <div class="ct">
+          <p class="cs-h">Сегодня · суббота, 7 ноября<span class="nx">на следующий день</span></p>
+          <div class="it-r">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span>
+            <div><p class="it-t">Уведомить МВД о заселении до конца дня, сегодня 7 ноября</p>
+            <p class="it-d">Анна Смирнова, номер 3. Обязательный миграционный учет гостей, за просрочку — штраф</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot">
+      <span>Имена и цифры в примерах вымышлены.</span>
+      <button class="pz" type="button" aria-label="Остановить движение" aria-pressed="false">
+        <svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="8.5" y="2" width="3" height="10" rx="1" fill="currentColor"/></svg>
+        <svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L4.9 1.7a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</div></main>
+
+<script>
+(() => {
+  const scene = document.getElementById('scene');
+  const stage = scene.querySelector('.stage');
+  const $ = (s) => stage.querySelector(s);
+  const STATES = ['busy', 'done', 'toast-on', 'r1', 'r2', 'r3', 'tone-in', 'x1', 'x2', 'x3', 'w1-on', 'w2-on', 'w3-on'];
+  const wide = () => matchMedia('(min-width:960px)').matches;
+
+  const rel = (el) => {
+    const a = stage.getBoundingClientRect(), b = el.getBoundingClientRect();
+    return { x: b.left - a.left, y: b.top - a.top, w: b.width, h: b.height };
+  };
+
+  // Линии от карточки к следствиям: на десктопе — ствол в промежутке и ветки вправо,
+  // на телефоне — ствол слева сверху вниз.
+  function wires() {
+    const C = rel($('.card')), B = rel($('.cta'));
+    let prevY = null;
+    [1, 2, 3].forEach((i) => {
+      const S = rel($('.cs' + i)), p = $('.w' + i), d = $('.d' + i);
+      let path, ex, ey;
+      if (wide()) {
+        const sx = C.x + C.w, sy = B.y + B.h / 2, tx = sx + 16;
+        ex = S.x; ey = S.y + S.h / 2;
+        const r = Math.min(10, Math.abs(ey - sy) / 2), dir = Math.sign(ey - sy);
+        path = dir === 0 ? `M${sx},${sy} H${ex}`
+          : `M${sx},${sy} H${tx - r} Q${tx},${sy} ${tx},${sy + dir * r} V${ey - dir * r} Q${tx},${ey} ${tx + r},${ey} H${ex}`;
+      } else {
+        const tx = 14, sy = prevY === null ? C.y + C.h : prevY - 12;
+        ex = S.x; ey = S.y + 22;
+        path = `M${tx},${sy} V${ey - 12} Q${tx},${ey} ${tx + 12},${ey} H${ex}`;
+        prevY = ey;
+      }
+      p.setAttribute('d', path);
+      const L = Math.ceil(p.getTotalLength()) + 1;
+      p.style.strokeDasharray = L;
+      p.dataset.len = L;
+      p.style.strokeDashoffset = stage.classList.contains(`w${i}-on`) ? 0 : L;
+      d.setAttribute('cx', ex); d.setAttribute('cy', ey);
+    });
+  }
+  const draw = (i) => () => { stage.classList.add(`w${i}-on`); $('.w' + i).style.strokeDashoffset = 0; };
+
+  function odo(v, instant) {
+    const o = $('.odo'), old = o.lastElementChild;
+    if (instant) { o.innerHTML = '<span>' + v + '</span>'; return; }
+    const n = document.createElement('span'); n.textContent = v; n.className = 'in';
+    o.append(n); void n.offsetWidth; n.className = '';
+    if (old) { old.className = 'out'; setTimeout(() => old.remove(), 460); }
+  }
+  function tap(sel) {
+    const b = $(sel), t = $('.tap'), c = $('.card').getBoundingClientRect(), r = b.getBoundingClientRect();
+    t.style.left = (r.left - c.left + r.width / 2) + 'px';
+    t.style.top = (r.top - c.top + r.height / 2) + 'px';
+    t.classList.remove('go'); void t.offsetWidth; t.classList.add('go');
+    b.classList.add('press'); setTimeout(() => b.classList.remove('press'), 180);
+  }
+  const add = (...c) => () => stage.classList.add(...c);
+  const rm = (...c) => () => stage.classList.remove(...c);
+
+  const steps = [
+    [1300, () => tap('.cta')],
+    [1450, add('busy')],
+    [1850, () => { stage.classList.remove('busy'); stage.classList.add('done', 'toast-on'); }],
+    [3050, rm('toast-on')],
+    [3400, draw(1)],
+    [3950, add('r1')],
+    [4550, add('tone-in')],
+    [5050, add('x1')],
+    [5650, draw(2)],
+    [6200, add('r2')],
+    [6750, () => odo('24')],
+    [7250, add('x2')],
+    [7850, draw(3)],
+    [8400, add('r3')],
+    [9000, add('x3')],
+  ];
+  const DUR = 9000 + 450 + 3000;
+
+  function reset() {
+    STATES.forEach((c) => stage.classList.remove(c));
+    odo('30', true);
+    wires();
+  }
+  function final() {
+    reset();
+    ['done', 'r1', 'r2', 'r3', 'tone-in', 'x1', 'x2', 'x3', 'w1-on', 'w2-on', 'w3-on'].forEach((c) => stage.classList.add(c));
+    odo('24', true);
+    wires();
+  }
+  let lastW = innerWidth;
+  window.addEventListener('resize', () => {
+    if (innerWidth === lastW) return; lastW = innerWidth;
+    stage.classList.add('nt'); wires(); void stage.offsetWidth; stage.classList.remove('nt');
+  });
+
+  /* ---------- общий цикл сцены ---------- */
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pz = scene.querySelector('.pz');
+  let timers = [], running = false, paused = false, visible = false;
+  const T = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const clear = () => { timers.forEach(clearTimeout); timers = []; scene.querySelectorAll('.ghost').forEach((g) => g.remove()); };
+  const noTrans = (fn) => { stage.classList.add('nt'); fn(); void stage.offsetWidth; stage.classList.remove('nt'); };
+
+  function cycle() {
+    const template = stage.cloneNode(true);
+    steps.forEach(([t, fn]) => T(t, fn));
+    T(DUR, () => {                       // мягкий повтор: стартовый кадр проявляется поверх финального
+      const g = template;
+      g.classList.add('ghost'); g.removeAttribute('role'); g.removeAttribute('aria-label'); g.setAttribute('aria-hidden', 'true');
+      scene.insertBefore(g, scene.firstChild);
+      void g.offsetWidth; g.style.opacity = '1';
+      T(650, () => { noTrans(reset); g.remove(); T(500, cycle); });
+    });
+  }
+  function play() { if (running) return; running = true; noTrans(reset); T(300, cycle); }
+  function stop() { if (!running) return; running = false; clear(); noTrans(reset); }
+  function sync() { (visible && !paused && !document.hidden) ? play() : stop(); if (paused) noTrans(final); }
+
+  noTrans(reset);
+  document.fonts && document.fonts.ready.then(() => noTrans(running ? wires : (paused || reduce ? final : reset)));
+  if (reduce) { document.documentElement.classList.add('reduce'); noTrans(final); return; }
+  pz.addEventListener('click', () => {
+    paused = !paused;
+    pz.setAttribute('aria-pressed', String(paused));
+    pz.setAttribute('aria-label', paused ? 'Продолжить движение' : 'Остановить движение');
+    if (paused) { stop(); noTrans(final); } else { noTrans(reset); sync(); }
+  });
+  new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.2 }).observe(stage);
+  document.addEventListener('visibilitychange', sync);
+})();
+</script>
+</body>
+</html>

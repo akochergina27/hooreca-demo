@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HoReCa Hub — герой B: утро</title>
+<style>
+@font-face{font-family:"Manrope";src:url(../fonts/manrope-cyrillic-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Manrope";src:url(../fonts/manrope-latin-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Golos";src:url(../fonts/golos-text-cyrillic-wght-normal.woff2) format("woff2");font-weight:400 900;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Golos";src:url(../fonts/golos-text-latin-wght-normal.woff2) format("woff2");font-weight:400 900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+/* Токены «Лесной домик» — значения из src/index.css */
+:root{
+  --bg:#f4f0e8;--fg:#1e2622;--surface:#fbf9f5;--tone:#ede7db;--tone-strong:#e6dfd0;--muted:#5e6660;
+  --primary:#2f5b45;--primary-hover:#264b39;--primary-soft:#e1eae2;--primary-ink:#24473a;
+  --warning:#b07a1c;--warning-soft:#f4ead2;--warning-ink:#7a5512;
+  --success:#4e7a3a;--success-soft:#e6eedc;--success-ink:#3b5e2b;
+  --danger-soft:#f5e4d9;--danger-ink:#9a4421;
+  --border:#e3dccd;--input-border:#857d6d;
+  --shadow-card:0 1px 2px rgb(60 48 30 / .05),0 6px 20px rgb(60 48 30 / .04);
+  --shadow-pop:0 2px 6px rgb(60 48 30 / .06),0 12px 32px rgb(60 48 30 / .08);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --ease-io:cubic-bezier(.5,0,.2,1);
+  --gut:16px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.5 "Golos",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+p{margin:0}
+a{color:inherit}
+ul{margin:0;padding:0;list-style:none}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+.wrap{width:100%;max-width:1224px;margin:0 auto;padding:0 var(--gut)}
+
+/* Шапка */
+.top .wrap{height:60px;display:flex;align-items:center;gap:18px}
+.logo{display:flex;align-items:center;gap:8px;margin-right:auto;font:700 17px/1 "Manrope",sans-serif;letter-spacing:-.01em;text-decoration:none}
+.logo i{width:20px;height:20px;border-radius:6px;background:var(--primary);position:relative}
+.logo i::after{content:"";position:absolute;left:5px;right:5px;bottom:5px;height:5px;border-radius:2px 2px 0 0;background:var(--primary-soft)}
+.login{font-size:15px;font-weight:500;text-decoration:none;color:var(--fg)}
+.login:hover{color:var(--primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 22px;border-radius:12px;font:500 16px/1 "Golos",sans-serif;text-decoration:none;white-space:nowrap;background:var(--primary);color:#fff;transition:background .2s}
+.btn:hover{background:var(--primary-hover)}
+.top .btn{height:38px;padding:0 14px;font-size:14px;border-radius:10px}
+
+/* Текст героя */
+.hero{padding:20px 0 40px}
+.eyebrow{font-size:14px;font-weight:500;color:var(--primary-ink);margin-bottom:12px}
+h1{margin:0;font:650 42px/1.04 "Manrope",system-ui,sans-serif;letter-spacing:-.025em;text-wrap:balance}
+.lead{color:var(--muted);margin-top:16px;max-width:520px}
+.ctas{display:flex;align-items:center;gap:22px;margin-top:20px}
+.ctas .login{font-size:16px}
+
+/* Сцена */
+.scene{margin-top:28px;position:relative;width:100%;max-width:400px}
+.stage{position:relative}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;font-size:13px;color:var(--muted)}
+.pz{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--fg);display:grid;place-items:center;cursor:pointer;padding:0}
+.pz:hover{border-color:var(--input-border)}
+.pz svg{width:14px;height:14px}
+.pz .i-play{display:none}
+.pz[aria-pressed="true"] .i-play{display:block}
+.pz[aria-pressed="true"] .i-pause{display:none}
+.reduce .pz{display:none}
+.ghost{position:absolute;left:0;top:0;width:100%;opacity:0;transition:opacity .6s var(--ease);pointer-events:none;z-index:20}
+.nt,.nt *{transition:none!important;animation:none!important}
+
+/* Часы — единственная человеческая деталь */
+.clock{font:500 44px/1 "Manrope",sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--fg);display:flex;align-items:baseline;margin:0 0 14px 4px;height:44px}
+.odo{display:inline-grid;overflow:hidden;vertical-align:bottom}
+.odo>span{grid-area:1/1;transition:transform .45s var(--ease),opacity .3s linear}
+.odo>span.in{transform:translateY(55%);opacity:0}
+.odo>span.out{transform:translateY(-55%);opacity:0}
+
+/* Экран «Сегодня» */
+.phone{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-card);font-size:14px;line-height:1.4}
+.scr{padding:18px 16px 20px}
+.t-date{font:650 22px/1.2 "Manrope",sans-serif;letter-spacing:-.015em}
+.t-load{color:var(--muted);font-size:13px;margin-top:4px}
+.sec{border-top:1px solid var(--border);margin-top:16px;padding-top:6px}
+.sec-h{display:flex;align-items:center;min-height:40px;font-size:15px;font-weight:600}
+.cnt{margin-left:8px;font-weight:400;color:var(--muted);transition:opacity .3s linear}
+.it{display:flex;flex-direction:column;gap:10px;padding:10px 0 12px;transition:opacity .3s linear}
+.it1{border-bottom:1px solid var(--border)}
+.it-r{display:flex;gap:12px;align-items:flex-start}
+.ic{flex:none;width:40px;height:40px;border-radius:16px;background:var(--primary-soft);color:var(--primary-ink);display:grid;place-items:center}
+.ic svg,.empty svg,.ok svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.it-t{font-weight:500}
+.it-d{color:var(--muted);font-size:13px;margin-top:2px}
+.ob{align-self:flex-start;margin-left:52px;display:inline-flex;align-items:center;height:36px;padding:0 14px;border:1px solid var(--input-border);border-radius:10px;font-weight:500;font-size:13.5px;background:var(--surface);transition:transform .15s var(--ease)}
+.empty{display:none;align-items:center;gap:8px;min-height:44px;font-size:15px;color:var(--primary-ink);opacity:0;transform:translateY(8px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.empty svg{width:18px;height:18px;color:var(--primary)}
+.mv{transition:transform .45s var(--ease)}
+.arr{opacity:.6}
+.arow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:4px 0}
+.arow .who{flex:1 1 100%}
+.chip{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:500;background:var(--warning-soft);color:var(--warning-ink)}
+.pb{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:10px;background:var(--primary);color:#fff;font-size:13px;font-weight:500;margin-left:auto}
+
+/* Тост, лист, касание */
+.toast{position:absolute;left:12px;right:12px;bottom:12px;z-index:8;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-pop);font-weight:500;opacity:0;transform:translateY(14px);transition:opacity .3s var(--ease),transform .4s var(--ease)}
+.ok{flex:none;width:24px;height:24px;border-radius:50%;background:var(--success-soft);color:var(--success-ink);display:grid;place-items:center}
+.ok svg{width:14px;height:14px;stroke-width:2.4}
+.shade{position:absolute;inset:0;z-index:5;background:rgb(30 38 34 / .22);opacity:0;transition:opacity .45s var(--ease)}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-radius:20px 20px 0 0;box-shadow:var(--shadow-pop);padding:10px 16px 76px;transform:translateY(102%);transition:transform .5s var(--ease)}
+.grip{display:block;width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 12px}
+.sh-t{font:650 18px/1.2 "Manrope",sans-serif;margin-bottom:12px}
+.room{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:14px}
+.room-r{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.room b{font-size:15px;font-weight:600}
+.dirty{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:500;background:var(--danger-soft);color:var(--danger-ink)}
+.room .pb{display:flex;justify-content:center;height:40px;margin:0;font-size:14px;transition:transform .15s var(--ease)}
+.tap{position:absolute;z-index:9;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--fg);opacity:0;pointer-events:none}
+.tap.go{animation:tap .5s var(--ease)}
+@keyframes tap{0%{opacity:0;transform:scale(.5)}30%{opacity:.18;transform:scale(.8)}100%{opacity:0;transform:scale(1.25)}}
+.press{transform:scale(.96)}
+
+/* Состояния */
+.t1-on .t1,.t2-on .t2{opacity:1;transform:none}
+.i1-off .it1,.i2-off .it2{opacity:0}
+.cnt-off .cnt{opacity:0}
+.sh-on .shade{opacity:1}
+.sh-on .sheet{transform:none}
+.e-on .empty{opacity:1;transform:none}
+.gone{display:none!important}
+.e-show .empty{display:flex}
+
+/* Телефон: часы в шапке экрана, экран высотой до сгиба */
+.ck-in{display:none}
+@media (max-width:959px){
+  .ck-out{display:none}
+  .ck-in{display:flex;float:right;font-size:28px;height:30px;margin:0 0 0 8px;color:var(--fg)}
+  .phone{max-height:470px}
+}
+@media (min-width:600px){:root{--gut:32px}}
+@media (min-width:768px){
+  .top .wrap{height:68px;gap:28px}
+  .top .btn{height:40px;padding:0 16px;font-size:15px}
+  .hero{padding-top:40px}
+  .eyebrow{font-size:15px;margin-bottom:16px}
+  .lead{font-size:17px}
+}
+/* Десктоп: текст слева, экран справа */
+@media (min-width:960px){
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:clamp(48px,6vw,112px);align-items:center}
+  .scene{margin-top:0;max-width:none}
+  h1{font-size:clamp(56px,4.4vw + 16px,80px)}
+  .lead{margin-top:24px}
+  .ctas{margin-top:32px}
+  .btn{height:52px;padding:0 26px}
+  .clock{font-size:56px;height:56px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="#"><i aria-hidden="true"></i>HoReCa Hub</a>
+  <a class="login" href="#">Войти</a>
+  <a class="btn" href="#waitlist">Запросить демо</a>
+</div></header>
+
+<main class="hero"><div class="wrap grid">
+  <div class="copy">
+    <p class="eyebrow">Программа для отеля, гостиницы и глэмпинга</p>
+    <h1>Срочных дел нет.</h1>
+    <p class="lead">Так выглядит утро, когда номер убран, а уведомление МВД отмечено. HoReCa Hub собирает дела на сегодня: заезды, выезды, уборку и срок миграционного учета.</p>
+    <div class="ctas"><a class="btn" href="#waitlist">Запросить демо</a><a class="login" href="#">Войти</a></div>
+  </div>
+
+  <div class="scene" id="scene">
+    <div class="stage" role="img" aria-label="Экран «Сегодня» в субботу утром: отметка об уведомлении МВД и уборка номера 2 закрывают оба срочных дела, остается надпись «Срочных дел нет.»">
+      <p class="clock ck-out" aria-hidden="true"><span>08:0</span><span class="odo" data-odo="clock"><span>2</span></span></p>
+      <div class="phone" aria-hidden="true">
+        <div class="scr">
+          <p class="clock ck-in"><span>08:0</span><span class="odo" data-odo="clock"><span>2</span></span></p>
+          <p class="t-date">Суббота, 7 ноября</p>
+          <p class="t-load">Загрузка 60% · занято 3 из 5 номеров</p>
+          <section class="sec">
+            <p class="sec-h">Требует внимания<span class="cnt odo" data-odo="cnt"><span>2</span></span></p>
+            <ul class="list">
+              <li class="it it1 mv">
+                <div class="it-r">
+                  <span class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span>
+                  <div><p class="it-t">Уведомить МВД о заселении до конца дня, сегодня 7 ноября</p>
+                  <p class="it-d">Анна Смирнова, номер 3. Обязательный миграционный учет гостей, за просрочку — штраф</p></div>
+                </div>
+                <span class="ob b1">Уведомление отправлено</span>
+              </li>
+              <li class="it it2 mv">
+                <div class="it-r">
+                  <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></svg></span>
+                  <div><p class="it-t">Номер 2 не убран, сегодня заезд</p>
+                  <p class="it-d">Ирина Ким</p></div>
+                </div>
+                <span class="ob b2">Уборка</span>
+              </li>
+              <li class="empty mv"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 3v4M17 5h4"/></svg>Срочных дел нет.</li>
+            </ul>
+          </section>
+          <section class="sec arr mv">
+            <p class="sec-h">Заезды сегодня</p>
+            <div class="arow"><span class="who"><b>Ирина Ким</b><br>Номер 2 · 2 взр.</span><span class="pb">Заселить</span></div>
+          </section>
+        </div>
+        <div class="toast t1"><span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Отмечено: уведомление МВД отправлено</div>
+        <div class="shade"></div>
+        <div class="sheet">
+          <i class="grip"></i>
+          <p class="sh-t">Уборка</p>
+          <div class="room">
+            <div class="room-r"><b>Номер 2</b><span class="dirty">Грязно</span></div>
+            <span class="pb b3">Убрано</span>
+          </div>
+        </div>
+        <div class="toast t2"><span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Номер 2 убран</div>
+        <i class="tap"></i>
+      </div>
+    </div>
+    <div class="foot">
+      <span>Имена и цифры в примерах вымышлены.</span>
+      <button class="pz" type="button" aria-label="Остановить движение" aria-pressed="false">
+        <svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="8.5" y="2" width="3" height="10" rx="1" fill="currentColor"/></svg>
+        <svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L4.9 1.7a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</div></main>
+
+<script>
+(() => {
+  const scene = document.getElementById('scene');
+  const stage = scene.querySelector('.stage');
+  const phone = stage.querySelector('.phone');
+  const $ = (s) => stage.querySelector(s);
+  const STATES = ['t1-on', 't2-on', 'i1-off', 'i2-off', 'cnt-off', 'sh-on', 'e-on', 'e-show'];
+  const ODO = { clock: '2', cnt: '2' };
+
+  // Экран не меняет высоту, пока список пустеет: высота фиксируется по стартовому кадру.
+  // На телефоне экран ниже не растет: он заканчивается у сгиба, как настоящий экран (CSS --ph).
+  function lockHeight() { phone.style.height = ''; phone.style.height = phone.offsetHeight + 'px'; }
+
+  function odo(name, v, instant) {
+    stage.querySelectorAll(`[data-odo="${name}"]`).forEach((o) => {
+      const old = o.lastElementChild;
+      if (instant) { o.innerHTML = '<span>' + v + '</span>'; return; }
+      const n = document.createElement('span'); n.textContent = v; n.className = 'in';
+      o.append(n); void n.offsetWidth; n.className = '';
+      if (old) { old.className = 'out'; setTimeout(() => old.remove(), 460); }
+    });
+  }
+  // Касание пальцем: след на кнопке и легкое нажатие.
+  function tap(sel) {
+    const b = $(sel), t = $('.tap');
+    const p = phone.getBoundingClientRect(), r = b.getBoundingClientRect();
+    t.style.left = (r.left - p.left + r.width / 2) + 'px';
+    t.style.top = (r.top - p.top + r.height / 2) + 'px';
+    t.classList.remove('go'); void t.offsetWidth; t.classList.add('go');
+    b.classList.add('press'); setTimeout(() => b.classList.remove('press'), 180);
+  }
+  // Пункт уходит из списка, все, что ниже, плавно поднимается (FLIP, только transform).
+  function collapse(change) {
+    const els = [...stage.querySelectorAll('.mv')];
+    const before = els.map((e) => (e.offsetParent ? e.getBoundingClientRect().top : null));
+    change();
+    els.forEach((e, i) => {
+      if (before[i] === null || !e.offsetParent) return;
+      const d = before[i] - e.getBoundingClientRect().top;
+      e.style.transition = 'none'; e.style.transform = `translateY(${d}px)`;
+    });
+    void stage.offsetWidth;
+    els.forEach((e) => { e.style.transition = ''; e.style.transform = ''; });
+  }
+  const add = (c) => () => stage.classList.add(c);
+  const rm = (c) => () => stage.classList.remove(c);
+
+  const steps = [
+    [1300, () => tap('.b1')],
+    [1550, add('t1-on')],
+    [2800, rm('t1-on')],
+    [3150, add('i1-off')],
+    [3450, () => { collapse(() => $('.it1').classList.add('gone')); odo('cnt', '1'); }],
+    [4100, () => odo('clock', '5')],
+    [4700, () => tap('.b2')],
+    [4950, add('sh-on')],
+    [5900, () => tap('.b3')],
+    [6150, add('t2-on')],
+    [7350, rm('t2-on')],
+    [7650, rm('sh-on')],
+    [8300, () => { stage.classList.add('i2-off', 'cnt-off'); }],
+    [8600, () => collapse(() => { $('.it2').classList.add('gone'); stage.classList.add('e-show'); })],
+    [9150, add('e-on')],
+    [9750, () => odo('clock', '9')],
+  ];
+  const DUR = 9750 + 450 + 3000;
+
+  function reset() {
+    STATES.forEach((c) => stage.classList.remove(c));
+    stage.querySelectorAll('.gone').forEach((e) => e.classList.remove('gone'));
+    stage.querySelectorAll('.mv').forEach((e) => { e.style.transform = ''; e.style.transition = ''; });
+    Object.entries(ODO).forEach(([k, v]) => odo(k, v, true));
+    lockHeight();
+  }
+  function final() {
+    reset();
+    $('.it1').classList.add('gone'); $('.it2').classList.add('gone');
+    ['cnt-off', 'e-show', 'e-on'].forEach((c) => stage.classList.add(c));
+    odo('clock', '9', true);
+  }
+  let lastW = innerWidth;
+  window.addEventListener('resize', () => {
+    if (innerWidth === lastW) return; lastW = innerWidth;
+    stage.classList.add('nt');
+    const fin = stage.classList.contains('e-on');
+    if (running && !fin) { /* идет цикл: перезапуск со стартового кадра */ stop(); reset(); sync(); }
+    else if (fin) { reset(); final(); } else reset();
+    void stage.offsetWidth; stage.classList.remove('nt');
+  });
+
+  /* ---------- общий цикл сцены ---------- */
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pz = scene.querySelector('.pz');
+  let template = null;
+  let timers = [], running = false, paused = false, visible = false;
+  const T = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const clear = () => { timers.forEach(clearTimeout); timers = []; scene.querySelectorAll('.ghost').forEach((g) => g.remove()); };
+  const noTrans = (fn) => { stage.classList.add('nt'); fn(); void stage.offsetWidth; stage.classList.remove('nt'); };
+
+  function cycle() {
+    template = stage.cloneNode(true);
+    steps.forEach(([t, fn]) => T(t, fn));
+    T(DUR, () => {                       // мягкий повтор: стартовый кадр проявляется поверх финального
+      const g = template;
+      g.classList.add('ghost'); g.removeAttribute('role'); g.removeAttribute('aria-label'); g.setAttribute('aria-hidden', 'true');
+      scene.insertBefore(g, scene.firstChild);
+      void g.offsetWidth; g.style.opacity = '1';
+      T(650, () => { noTrans(reset); g.remove(); T(500, cycle); });
+    });
+  }
+  function play() { if (running) return; running = true; noTrans(reset); T(300, cycle); }
+  function stop() { if (!running) return; running = false; clear(); noTrans(reset); }
+  function sync() { (visible && !paused && !document.hidden) ? play() : stop(); if (paused) noTrans(final); }
+
+  noTrans(reset);
+  if (reduce) { document.documentElement.classList.add('reduce'); noTrans(final); return; }
+  pz.addEventListener('click', () => {
+    paused = !paused;
+    pz.setAttribute('aria-pressed', String(paused));
+    pz.setAttribute('aria-label', paused ? 'Продолжить движение' : 'Остановить движение');
+    if (paused) { stop(); noTrans(final); } else { noTrans(reset); sync(); }
+  });
+  new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.2 }).observe(stage);
+  document.addEventListener('visibilitychange', sync);
+})();
+</script>
+</body>
+</html>
